@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<record GiftID="1" Type="1" PriceFlag="1" Price="50" MaxPrice="10000"
+		MinPrice="5" CurLastTime="86400" TotalLastTime="864000" Name="西瓜" />
+	<record GiftID="2" Type="1" PriceFlag="1" Price="75" MaxPrice="12000"
+		MinPrice="5" CurLastTime="86400" TotalLastTime="864000" Name="生日蛋糕" />
+	<record GiftID="3" Type="1" PriceFlag="1" Price="80" MaxPrice="15000"
+		MinPrice="10" CurLastTime="86400" TotalLastTime="864000" Name="冰淇淋" />
+	<record GiftID="4" Type="1" PriceFlag="1" Price="85" MaxPrice="20000"
+		MinPrice="25" CurLastTime="86400" TotalLastTime="864000" Name="薯条" />
+	<record GiftID="5" Type="1" PriceFlag="1" Price="120" MaxPrice="20000"
+		MinPrice="25" CurLastTime="86400" TotalLastTime="864000" Name="小面包" />
+	<record GiftID="6" Type="1" PriceFlag="1" Price="125" MaxPrice="22000"
+		MinPrice="30" CurLastTime="86400" TotalLastTime="864000" Name="葡萄酒" />
+	<record GiftID="7" Type="1" PriceFlag="1" Price="150" MaxPrice="25000"
+		MinPrice="45" CurLastTime="86400" TotalLastTime="864000" Name="汉堡" />
+	<record GiftID="8" Type="1" PriceFlag="1" Price="220" MaxPrice="28000"
+		MinPrice="50" CurLastTime="86400" TotalLastTime="864000" Name="咖啡" />
+	<record GiftID="9" Type="1" PriceFlag="1" Price="350" MaxPrice="50000"
+		MinPrice="80" CurLastTime="86400" TotalLastTime="864000" Name="草莓" />
+	<record GiftID="10" Type="1" PriceFlag="1" Price="450" MaxPrice="80000"
+		MinPrice="120" CurLastTime="86400" TotalLastTime="864000" Name="棒棒糖" />
+	<record GiftID="11" Type="1" PriceFlag="1" Price="800" MaxPrice="120000"
+		MinPrice="300" CurLastTime="86400" TotalLastTime="864000" Name="寿司" />
+	<record GiftID="12" Type="1" PriceFlag="1" Price="1000"
+		MaxPrice="150000" MinPrice="500" CurLastTime="86400" TotalLastTime="864000"
+		Name="比萨" />
+	<record GiftID="13" Type="1" PriceFlag="1" Price="1200"
+		MaxPrice="160000" MinPrice="600" CurLastTime="86400" TotalLastTime="864000"
+		Name="奶油蛋糕" />
+	<record GiftID="14" Type="1" PriceFlag="1" Price="1500"
+		MaxPrice="180000" MinPrice="800" CurLastTime="86400" TotalLastTime="864000"
+		Name="橙汁" />
+	<record GiftID="15" Type="1" PriceFlag="1" Price="2000"
+		MaxPrice="200000" MinPrice="1000" CurLastTime="86400" TotalLastTime="864000"
+		Name="果汁" />
+	<record GiftID="16" Type="1" PriceFlag="1" Price="2200"
+		MaxPrice="210000" MinPrice="1200" CurLastTime="86400" TotalLastTime="864000"
+		Name="香蕉" />
+	<record GiftID="17" Type="1" PriceFlag="1" Price="2500"
+		MaxPrice="250000" MinPrice="1500" CurLastTime="86400" TotalLastTime="864000"
+		Name="葡萄" />
+	<record GiftID="101" Type="2" PriceFlag="1" Price="350"
+		MaxPrice="30000" MinPrice="25" CurLastTime="86400" TotalLastTime="864000"
+		Name="幸运射手" />
+	<record GiftID="102" Type="2" PriceFlag="1" Price="435"
+		MaxPrice="35000" MinPrice="30" CurLastTime="86400" TotalLastTime="864000"
+		Name="神算保罗" />
+	<record GiftID="103" Type="2" PriceFlag="1" Price="520"
+		MaxPrice="45000" MinPrice="45" CurLastTime="86400" TotalLastTime="864000"
+		Name="观音" />
+	<record GiftID="104" Type="2" PriceFlag="1" Price="530"
+		MaxPrice="48000" MinPrice="48" CurLastTime="86400" TotalLastTime="864000"
+		Name="扑克女神" />
+	<record GiftID="105" Type="2" PriceFlag="1" Price="550"
+		MaxPrice="50000" MinPrice="50" CurLastTime="86400" TotalLastTime="864000"
+		Name="招财猪" />
+	<record GiftID="106" Type="2" PriceFlag="1" Price="580"
+		MaxPrice="52000" MinPrice="55" CurLastTime="86400" TotalLastTime="864000"
+		Name="摇钱树" />
+	<record GiftID="107" Type="2" PriceFlag="1" Price="850"
+		MaxPrice="60000" MinPrice="75" CurLastTime="86400" TotalLastTime="864000"
+		Name="长耳兔" />
+	<record GiftID="108" Type="2" PriceFlag="1" Price="950"
+		MaxPrice="65000" MinPrice="85" CurLastTime="86400" TotalLastTime="864000"
+		Name="辟邪剑" />
+	<record GiftID="109" Type="2" PriceFlag="1" Price="980"
+		MaxPrice="68000" MinPrice="90" CurLastTime="86400" TotalLastTime="864000"
+		Name="圣诞老人" />
+	<record GiftID="110" Type="2" PriceFlag="1" Price="1500"
+		MaxPrice="90000" MinPrice="150" CurLastTime="86400" TotalLastTime="864000"
+		Name="招财猫" />
+	<record GiftID="111" Type="2" PriceFlag="1" Price="2500"
+		MaxPrice="120000" MinPrice="300" CurLastTime="86400" TotalLastTime="864000"
+		Name="财神" />
+	<record GiftID="112" Type="2" PriceFlag="1" Price="2800"
+		MaxPrice="150000" MinPrice="320" CurLastTime="86400" TotalLastTime="864000"
+		Name="水晶球" />
+	<record GiftID="201" Type="3" PriceFlag="2" Price="100000"
+		MaxPrice="100000" MinPrice="100000" CurLastTime="86400" TotalLastTime="8640000"
+		Name="蓝钻" />
+	<record GiftID="202" Type="3" PriceFlag="2" Price="300000"
+		MaxPrice="300000" MinPrice="300000" CurLastTime="86400" TotalLastTime="8640000"
+		Name="绿钻" />
+	<record GiftID="203" Type="3" PriceFlag="2" Price="1000000"
+		MaxPrice="1000000" MinPrice="1000000" CurLastTime="86400"
+		TotalLastTime="8640000" Name="粉钻" />
+	<record GiftID="204" Type="3" PriceFlag="2" Price="5000000"
+		MaxPrice="5000000" MinPrice="5000000" CurLastTime="86400"
+		TotalLastTime="8640000" Name="黄钻" />
+	<record GiftID="205" Type="3" PriceFlag="2" Price="20000000"
+		MaxPrice="20000000" MinPrice="20000000" CurLastTime="86400"
+		TotalLastTime="8640000" Name="红钻" />
+</root>

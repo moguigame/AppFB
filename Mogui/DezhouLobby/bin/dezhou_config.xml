@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Path>
+	<CDN>http://hzweb.sanguosha.com/dz_poker/FlashRes/</CDN>
+	<Lobby>
+		<Tab Flag="2" Place="111"></Tab>
+	</Lobby>
+	<Game>
+		<ServerAddr IP="115.29.240.67" Port="5536"></ServerAddr>
+		<!--<ServerAddr IP="192.168.1.104" Port="5536"></ServerAddr>-->
+		<!--<ServerAddr IP="127.0.0.1" Port="5536"></ServerAddr>-->
+		<!--<ServerAddr IP="115.29.240.67" Port="5536"></ServerAddr>-->
+		<!--<ServerAddr IP="218.108.131.23" Port="5536"></ServerAddr>-->
+	</Game>
+	<Res>
+        <LobbyRes version="20130201">assets/DZPKlobby.swf</LobbyRes>
+        <GameRes version="20130201">assets/DZPK_pai.swf</GameRes>
+        <GameConfig version="20130201">DZPKConfiger.xml</GameConfig>
+	</Res>
+</Path>
