@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>DezhouLobby</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>com.adobe.flexbuilder.project.flexbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>[source path] OpenSrc</name>
+			<type>2</type>
+			<location>E:/AppFB/Mogui/OpenSrc</location>
+		</link>
+		<link>
+			<name>[source path] PublicSrc</name>
+			<type>2</type>
+			<location>E:/AppFB/Mogui/PublicSrc</location>
+		</link>
+	</linkedResources>
+</projectDescription>
