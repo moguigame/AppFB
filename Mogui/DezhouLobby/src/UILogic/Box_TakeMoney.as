@@ -67,7 +67,7 @@ package UILogic
 			tf.font = "黑体";
 			tf.bold = true;
 			tTitle.SetTextFormat(tf);
-			tTitle.SetCenterPointXY(StartX+220,StartY+30);			
+			tTitle.SetCenterPointXY(StartX+220,StartY+30);
 			
 			var back4:Image = new Image("png.comp.image_box_bg4");
 			back4.x = StartX + (440-back4.width)/2;
