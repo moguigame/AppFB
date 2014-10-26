@@ -13,8 +13,7 @@ package Game
 		
 		public var m_Sex:int;
 		public var m_PlayerType:int;
-		public var m_ChangeName:int;
-		public var m_Year:int;
+		public var m_ChangeName:int;		
 		
 		public var m_nBankMoney:Number;
 		public var m_OpenBank:int;
@@ -53,7 +52,6 @@ package Game
 			m_Sex = 0;
 			m_PlayerType = 0;
 			m_ChangeName = 0;
-			m_Year = 0;
 			
 			m_nBankMoney = 0;
 			m_OpenBank = 0;
@@ -95,8 +93,7 @@ package Game
 			
 			m_Sex = msgdata.ReadUnsignedByte();
 			m_PlayerType = msgdata.ReadUnsignedByte();
-			m_ChangeName = msgdata.ReadUnsignedByte();
-			m_Year = msgdata.ReadUnsignedShort();
+			m_ChangeName = msgdata.ReadInt();
 			
 			m_nBankMoney = msgdata.ReadBigNumber();
 			m_OpenBank = msgdata.ReadUnsignedByte();

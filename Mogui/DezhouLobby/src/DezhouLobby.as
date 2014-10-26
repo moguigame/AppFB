@@ -2476,8 +2476,7 @@ package
 			
 			m_MyData.m_Sex             = msgPD.m_Sex;
 			//m_MyData.m_PlayerType      = msgPD.m_PlayerType;
-			//m_MyData.m_ChangeName      = msgPD.m_ChangeName;
-			//m_MyData.m_Year            = msgPD.m_Year;
+			//m_MyData.m_ChangeName      = msgPD.m_ChangeName;			
 			
 			m_MyData.m_NickName        = msgPD.m_NickName;
 			m_MyData.m_HeadPicURL      = msgPD.m_HeadPicURL;
