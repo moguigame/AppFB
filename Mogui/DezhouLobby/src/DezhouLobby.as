@@ -1007,7 +1007,7 @@ package
 						m_winShop.visible = true;
 						m_winShop.m_boxShop.Show(GlobleData.m_BasePrice,Box_Shop.ShopType_MySelf);
 					}
-					else if( nFlag == LobbyTopBar::E_ChongZhi ){
+					else if( nFlag == LobbyTopBar.E_ChongZhi ){
 						
 					}					
 				}
