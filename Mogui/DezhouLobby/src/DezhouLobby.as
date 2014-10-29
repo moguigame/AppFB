@@ -56,6 +56,7 @@ package
 	import Game.Game_ReqPlayerGiftInfo;
 	import Game.Game_ReqRoomTableInfo;
 	import Game.Game_ReqSendGift;
+	import Game.Game_ReqSoldGift;
 	import Game.Game_RespChangeBank;
 	import Game.Game_RespCreateTable;
 	import Game.Game_RespJoinRoom;
@@ -63,6 +64,7 @@ package
 	import Game.Game_RespPlayerAct;
 	import Game.Game_RespRoomTableInfo;
 	import Game.Game_RespSendGift;
+	import Game.Game_RespSoldGift;
 	import Game.Game_RoomInfo;
 	import Game.Game_RoomInfoList;
 	import Game.Game_SendGift;
@@ -100,6 +102,7 @@ package
 	import UILogic.CCommonMatch;
 	import UILogic.CJuBaoPengRule;
 	import UILogic.CNoticeBoard;
+	import UILogic.CPlayerActon;
 	import UILogic.LobbyTopBar;
 	import UILogic.MoguiViewStack;
 	import UILogic.PlayerInfoBoard;
@@ -114,7 +117,6 @@ package
 	import UILogic.Window_CreateTable;
 	import UILogic.Window_PlayerInfo;
 	import UILogic.Window_Shop;
-	import UILogic.CPlayerActon;
 	
 	import events.ClientToLobby;
 	import events.LobbyToClient;
@@ -1099,6 +1101,13 @@ package
 						var nRecvPID:int = int(msgFlag.m_msgString);
 						m_winShop.m_boxShop.m_PIDSendFriend = nRecvPID;
 					}
+					else if( nValue == Box_PlayerInfo.BNT_SELLGIFT ){
+						var nGiftIdx:int = int(msgFlag.m_msgString);
+						var msgSG:Game_ReqSoldGift = new Game_ReqSoldGift();
+						msgSG.m_SoldPID = m_MyData.m_PID;
+						msgSG.m_arrayGiftIdx.push(nGiftIdx);
+						m_gamesocket.SendMsg(msgSG);
+					}
 				}
 				break;
 				default:
@@ -1412,7 +1421,12 @@ package
 				{
 					OnPlayerGiftInfoList(msgData);
 				}
-				break;				
+				break;
+				case Game_RespSoldGift.ID:
+				{
+					OnRespSoldGift(msgData);
+				}
+				break;
 				case Game_TableInfoList.ID:
 				{
 					OnTableInfoList(msgData);
@@ -2294,6 +2308,17 @@ package
 					m_winPlayerInfo.m_boxInfo.UpdatePassGift();
 				}
 			}
+		}
+		private function OnRespSoldGift(msgData:MsgData):void
+		{
+			DebugLog("OnRespSoldGift");
+			
+			var msgGIL:Game_RespSoldGift = new Game_RespSoldGift();
+			msgGIL.Read(msgData);
+			
+			if( m_winPlayerInfo.visible ){
+				
+			}			
 		}
 		private function OnPlayerGameMoney(msgData:MsgData):void
 		{

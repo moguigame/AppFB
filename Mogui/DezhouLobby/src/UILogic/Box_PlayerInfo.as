@@ -23,6 +23,7 @@ package UILogic
 		
 		public static var BTN_CLOSE:int       = 1;
 		public static var BTN_SENDGIFT:int    = 2;
+		public static var BNT_SELLGIFT:int    = 3;
 		
 		public var m_SamllHead:CLoadImage;
 		public var m_BigHead:CLoadImage;
@@ -99,6 +100,8 @@ package UILogic
 			m_btnClose.addEventListener(MouseEvent.CLICK,OnBtnClose);
 			
 			m_btnSendGift.addEventListener(MouseEvent.CLICK,OnSendGift);
+			m_btnSellCurGift.addEventListener(MouseEvent.CLICK,OnSellCurGift);			
+			m_btnSellPassGift.addEventListener(MouseEvent.CLICK,OnSellPassGift);
 		}
 		
 		private function OnSendGift(evt:MouseEvent):void
@@ -116,6 +119,35 @@ package UILogic
 					GlobleFunc.SendStageToLobby(stage,msgFlag);
 				}
 			}
+		}
+		
+		private function OnSellCurGift(evt:MouseEvent):void{
+			if( m_CurPID == GlobleData.s_MyPID
+				&& m_tab.selectedIndex == s_Gift
+				&& m_ListCurGift.selectedIndex>=0 && m_ListCurGift.selectedIndex<m_arrayCurGift.length ){				
+				var nGiftIdx:int = m_arrayCurGift[m_ListCurGift.selectedIndex].m_GiftIdx;
+				if( nGiftIdx > 0 ){
+					var msgFlag:S2L_Flag = new S2L_Flag();
+					msgFlag.m_Flag     = S2L_Flag.PlayerInfo;
+					msgFlag.m_Value    = BNT_SELLGIFT;
+					msgFlag.m_msgString = String(nGiftIdx);
+					GlobleFunc.SendStageToLobby(stage,msgFlag);
+				}
+			}			
+		}
+		private function OnSellPassGift(evt:MouseEvent):void{
+			if( m_CurPID == GlobleData.s_MyPID
+				&& m_tab.selectedIndex == s_Gift
+				&& m_ListPassGift.selectedIndex>=0 && m_ListPassGift.selectedIndex<m_arrayPassGift.length ){				
+				var nGiftIdx:int = m_arrayPassGift[m_ListPassGift.selectedIndex].m_GiftIdx;
+				if( nGiftIdx > 0 ){
+					var msgFlag:S2L_Flag = new S2L_Flag();
+					msgFlag.m_Flag     = S2L_Flag.PlayerInfo;
+					msgFlag.m_Value    = BNT_SELLGIFT;
+					msgFlag.m_msgString = String(nGiftIdx);
+					GlobleFunc.SendStageToLobby(stage,msgFlag);
+				}
+			}			
 		}
 		
 		public function Show(InfoData:Data_PlayerInfo):void
