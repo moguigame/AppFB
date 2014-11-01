@@ -3,9 +3,9 @@ package UILogic
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Point;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
-	import flash.geom.Point;
 	
 	import Data.Data_GiftConfig;
 	
@@ -37,14 +37,15 @@ package UILogic
 		public var m_TabGiftType:int;
 		public var m_vectorGiftConfig:Vector.<Data_GiftConfig>;
 		
-		public var m_arrayShowGC:Array;		
+		public var m_arrayShowGC:Array;
 		public var m_listGift:List_GiftShop;
 		
 		public var m_nSelectID:int;
-		public var m_mcGift:MovieClip;
+		public var m_mcGift:MovieClip;		
 		
 		public var m_SendType:int;
 		public var m_PIDSendFriend:int;
+		public var m_PIDSendPlayer:int;		
 		public var m_arrayPIDSendPlayer:Vector.<int>;
 		
 		public var m_TiShi:TimeShowTishi;
@@ -92,6 +93,7 @@ package UILogic
 			
 			m_SendType = ShopType_None;
 			m_PIDSendFriend = 0;
+			m_PIDSendPlayer = 0;
 			m_arrayPIDSendPlayer = new Vector.<int>;
 			
 			m_btnSendFriend.x = m_btnBuySelf.x;
@@ -201,7 +203,7 @@ package UILogic
 		}
 		private function OnBtnSendPlayer(evt:MouseEvent):void
 		{
-			if( m_SendType == ShopType_Player ){
+			if( m_SendType == ShopType_Player && m_PIDSendPlayer>0 ){
 				if( m_nSelectID > 0 ){
 					addChild(m_TimeMask);
 					m_TimeMask.ShowTime(500);
@@ -209,9 +211,9 @@ package UILogic
 					m_TiShi.m_tTishi.SetText("");
 					
 					var msgFlag:S2L_Flag = new S2L_Flag();
-					msgFlag.m_Flag     = S2L_Flag.Shop;
-					msgFlag.m_Value    = E_BuySelf;
-					msgFlag.m_msgString = String(GlobleData.s_MyPID);
+					msgFlag.m_Flag      = S2L_Flag.Shop;
+					msgFlag.m_Value     = E_BuyPlayer;
+					msgFlag.m_msgString = String(m_PIDSendPlayer);
 					GlobleFunc.SendStageToLobby(stage,msgFlag);
 				}
 				else{
@@ -257,7 +259,7 @@ package UILogic
 			var nSelectIndex:int = m_tabGift.selectedIndex;
 			
 			if( nSelectIndex == 0 ){
-				m_TabGiftType = GiftType_All;		
+				m_TabGiftType = GiftType_All;
 			}
 			else if( nSelectIndex == 1 ){
 				m_TabGiftType = GiftType_Food;
@@ -269,7 +271,8 @@ package UILogic
 				m_TabGiftType = GiftType_ZiChan;
 			}
 			
-			m_listGift.selectedIndex = -1;
+			m_listGift.selectedIndex = 0;
+			m_listGift.scrollBar.value = 0;
 			OnSelectGift(null);
 			
 			UpdateGift();

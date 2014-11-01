@@ -41,6 +41,7 @@ package UILogic
 		public var m_tFriendCount:CText;
 		public var m_ListFI:List_FriendInfo;
 		
+		public var m_GiftFlag:int;
 		public var m_ListCurGift:List_PlayerGift;
 		public var m_ListPassGift:List_PlayerGift;
 		
@@ -72,6 +73,7 @@ package UILogic
 			m_arrayCurGift = new Array();
 			m_arrayPassGift = new Array();
 			m_arrayFriend = new Array();
+			m_GiftFlag = -1;
 			
 			m_ListFI = new List_FriendInfo(4,2);
 			m_Friend.addChild(m_ListFI);
@@ -174,7 +176,12 @@ package UILogic
 			m_tMoney.text          = "$"+String(InfoData.m_nGameMoney);
 			
 			m_textNickName.text    = InfoData.m_NickName;
-			m_textPID.text         = String(InfoData.m_PID);
+			if( InfoData.m_PID ==  GlobleData.s_MyPID ){
+				m_textPID.text         = String(InfoData.m_PID);
+			}
+			else{
+				m_textPID.visible = false;
+			}			
 			m_textGameMoney.text   = "$"+String(InfoData.m_nGameMoney);
 			
 			var nTotalTimes:int   = Math.max(InfoData.m_nWinTimes+InfoData.m_nLossTimes,1);
@@ -184,10 +191,18 @@ package UILogic
 			m_tMaxMoney.text       = "$"+String(InfoData.m_MaxMoney);
 			m_tMaxWin.text         = "$"+String(InfoData.m_MaxWin);
 			
-			m_tBigPaiTime.text     = GlobleFunc.GetDate(InfoData.m_MaxPaiTime);
-			m_tMaxMoneyTime.text   = GlobleFunc.GetDate(InfoData.m_MaxMoneyTime);
-			m_tMaxWinTime.text     = GlobleFunc.GetDate(InfoData.m_MaxWinTime);
-			m_tJoinTime.text       = GlobleFunc.GetDate(InfoData.m_JoinTime);
+			if( InfoData.m_MaxPaiTime > 0 ){
+				m_tBigPaiTime.text     = GlobleFunc.GetDate(InfoData.m_MaxPaiTime);
+			}
+			if( InfoData.m_MaxPaiTime > 0 ){
+				m_tMaxMoneyTime.text   = GlobleFunc.GetDate(InfoData.m_MaxMoneyTime);
+			}
+			if( InfoData.m_MaxPaiTime > 0 ){
+				m_tMaxWinTime.text     = GlobleFunc.GetDate(InfoData.m_MaxWinTime);
+			}
+			if( InfoData.m_MaxPaiTime > 0 ){
+				m_tJoinTime.text       = GlobleFunc.GetDate(InfoData.m_JoinTime);
+			}			
 		}
 		public function UpdataFriend():void
 		{
@@ -200,6 +215,8 @@ package UILogic
 		}
 		public function UpdateCurGift():void
 		{
+			m_ListCurGift.selectedIndex = 0;
+			m_ListCurGift.scrollBar.value = 0;
 			m_arrayCurGift.splice(0,m_arrayCurGift.length);
 			for(var i:int=0;i<m_InfoData.m_arrayCurGift.length;++i){
 				var TempData:msgPlayerGiftInfo = new msgPlayerGiftInfo();
@@ -211,6 +228,8 @@ package UILogic
 		}
 		public function UpdatePassGift():void
 		{
+			m_ListPassGift.selectedIndex = 0;
+			m_ListPassGift.scrollBar.value = 0;
 			m_arrayPassGift.splice(0,m_arrayPassGift.length);
 			for(var i:int=0;i<m_InfoData.m_arrayPassGift.length;++i){
 				var TempData:msgPlayerGiftInfo = new msgPlayerGiftInfo();
@@ -226,8 +245,12 @@ package UILogic
 			m_viewstack.selectedIndex = m_tab.selectedIndex;
 			
 			if( m_tab.selectedIndex == s_Info ){
+				
 			}
 			else if( m_tab.selectedIndex == s_Gift ){
+				if( m_GiftFlag == - 1 ){
+					m_tabGift.selectedIndex = 0;
+				}
 			}
 			else if( m_tab.selectedIndex == s_Friend ){
 				UpdataFriend();
@@ -238,6 +261,13 @@ package UILogic
 		private function OnTabGiftSelect(evt:Event):void
 		{
 			m_viewGift.selectedIndex = m_tabGift.selectedIndex;
+			m_GiftFlag = m_tabGift.selectedIndex;
+			if( m_GiftFlag == 0 ){
+				UpdateCurGift();
+			}
+			else if( m_GiftFlag == 1 ){
+				UpdatePassGift();
+			}
 		}
 		private function OnBtnClose(evt:MouseEvent):void
 		{

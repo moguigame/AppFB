@@ -44,6 +44,7 @@ package UILogic
 			var msgFlag:S2L_Flag = new S2L_Flag();
 			msgFlag.m_Flag     = S2L_Flag.PlayerAction;
 			msgFlag.m_Value    = E_TailInfo;
+			msgFlag.m_msgString= String(m_CurPID);
 			GlobleFunc.SendStageToLobby(stage,msgFlag);
 		}
 		public function OnSendGift(evt:MouseEvent):void{
@@ -51,8 +52,9 @@ package UILogic
 			m_nEndTime = 0;
 			
 			var msgFlag:S2L_Flag = new S2L_Flag();
-			msgFlag.m_Flag     = S2L_Flag.PlayerAction;
-			msgFlag.m_Value    = E_SendGift;
+			msgFlag.m_Flag      = S2L_Flag.PlayerAction;
+			msgFlag.m_Value     = E_SendGift;
+			msgFlag.m_msgString = String(m_CurPID);
 			GlobleFunc.SendStageToLobby(stage,msgFlag);
 		}
 		public function OnAddFriend(evt:MouseEvent):void{
@@ -69,8 +71,9 @@ package UILogic
 			this.visible = true;
 			m_nEndTime = getTimer() + nLastTime;
 			
-			m_head.url = GP.m_HeadPicURL;
-			m_tNickName.text = GP.m_NickName;
+			m_CurPID          = GP.m_PID;
+			m_head.url        = GP.m_HeadPicURL;
+			m_tNickName.text  = GP.m_NickName;
 			m_tGameMoney.text = String(GP.m_TableMoney);
 		}
 		

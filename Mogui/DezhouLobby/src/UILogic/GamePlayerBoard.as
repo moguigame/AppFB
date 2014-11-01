@@ -34,6 +34,7 @@ package UILogic
 		public var m_EndTurnTime:int;  //记录TURN的结束时间
 		public var m_MatchRank:int;    //比赛被淘汰的名次
 		public var m_nChipTime:int;
+		public var m_GiftID:int;
 		
 		private var m_spBack:Sprite;
 		private var m_textLevel:CText;
@@ -44,6 +45,7 @@ package UILogic
 		private var m_textTime:CText;
 		private var m_spWashOut:Sprite;
 		public  var m_spDaoJiShi:MovieClip;
+		public var  m_mcGift:MovieClip;
 		
 		private var m_MouseOverTime:int;
 		
@@ -86,6 +88,9 @@ package UILogic
 			addChild(m_HeadPic);
 			m_HeadPic.x = 16;
 			m_HeadPic.y = 20;
+			
+			m_mcGift = new MovieClip();
+			addChild(m_mcGift);
 			
 			m_HeadPic.addEventListener(MouseEvent.ROLL_OVER,OnMouseOverHeadPic);
 			m_HeadPic.addEventListener(MouseEvent.ROLL_OUT,OnMouseOutHeadPic);
@@ -160,6 +165,7 @@ package UILogic
 		{
 			if( m_MouseOverTime>0 && (nTime-m_MouseOverTime)>GlobleData.s_PlayerTailTime )
 			{
+				m_MouseOverTime = 0;
 				var msgFlag:S2C_Flag = new S2C_Flag();
 				msgFlag.m_Flag       = S2C_Flag.MouseOverHeadPic;
 				msgFlag.m_Value      = m_PID;
@@ -177,6 +183,21 @@ package UILogic
 				nCurFrame = Math.max(0,nCurFrame-1);
 				m_spDaoJiShi.gotoAndStop(nCurFrame);
 			}
+		}
+		
+		public function SetGift(GID:int):void{			
+			if( GID == 0 ){
+				if( m_mcGift ){
+					m_mcGift.visible = false;
+				}
+			}
+			else if( GID != m_GiftID ){				
+				var TempClass:Class;
+				TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(GID));				
+				m_mcGift = new TempClass();
+				addChild(m_mcGift);
+				m_mcGift.visible = true;
+			}			
 		}
 		
 		public function SetTableMoney(nMoney:Number):void
@@ -308,6 +329,7 @@ package UILogic
 				m_HeadPic.url           = dataGamePlayer.m_HeadPicURL;
 				m_GameState             = dataGamePlayer.m_PlayerGameState;
 				m_MatchRank             = dataGamePlayer.m_MatchRank;
+				m_GiftID                = dataGamePlayer.m_GiftID;
 				
 				m_spWashOut.visible = (m_GameState == DeZhouDef.GAME_PLAYER_ST_WASHOUT);
 				
@@ -315,6 +337,7 @@ package UILogic
 				SetTableMoney(dataGamePlayer.m_TableMoney);
 				SetAction(dataGamePlayer.m_Action);
 				SetGameLevel(dataGamePlayer.m_GameLevel);
+				SetGift(dataGamePlayer.m_GiftID);
 			}
 			else{
 				this.visible = false;

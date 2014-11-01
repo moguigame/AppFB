@@ -50,6 +50,7 @@ package
 	import Logic.Logic_Relink;
 	import Logic.Logic_ReqAddChip;
 	import Logic.Logic_ReqShowFace;
+	import Logic.Logic_RespSendGift;
 	import Logic.Logic_RespShowFace;
 	import Logic.Logic_SitPlayerInfo;
 	import Logic.Logic_Start;
@@ -569,7 +570,7 @@ package
 			DebugLog("GameClient OnAddToStage");
 			
 			stage.addEventListener(LobbyToClient.EVENT_ID,OnLobbyToClient);
-			stage.addEventListener(StageToClient.EVENT_ID,OnStageToClient);			
+			stage.addEventListener(StageToClient.EVENT_ID,OnStageToClient);	
 			
 			if( m_ClientState == DeZhouDef.ClientState_None )
 			{
@@ -592,8 +593,7 @@ package
 			
 			GlobleData.S_pResGame = m_GameRes;
 			GlobleData.StaticInitChipClass(m_GameRes);
-			GlobleData.StaticInitPaiClass(m_GameRes);
-			GlobleData.StaticInitPlayerInfo();
+			GlobleData.StaticInitPaiClass(m_GameRes);			
 			
 			var i:int=0;
 			var TempClass:Class;
@@ -1078,6 +1078,8 @@ package
 			
 			if( ClientSit >=0 && ClientSit<m_MaxSitPlayerCount ){
 				addChild(m_spPlayerAction);
+				
+				m_spPlayerAction.m_Sit = ClientSit;
 				m_spPlayerAction.Show(m_dataArrayGamePlayerInfo[ServerSitID-1],3000);
 				m_spPlayerAction.x = m_ptAction[ClientSit].x;
 				m_spPlayerAction.y = m_ptAction[ClientSit].y;				
@@ -2423,6 +2425,11 @@ package
 					OnLogicMatchResult(TempMsgData);
 				}
 				break;
+				case Logic_RespSendGift.ID:
+				{
+					OnLogicRespSendGift(TempMsgData);
+				}
+				break;
 				
 				//以下是未处理的消息
 				case Logic_JoinJuBaoPeng.ID:
@@ -3066,6 +3073,16 @@ package
 				UpdateBankerInfo();
 			}
 		}
+		
+		private function OnLogicRespSendGift(msgdata:MsgData):void
+		{
+			var msgSG:Logic_RespSendGift = new Logic_RespSendGift();
+			msgSG.Read(msgdata);
+			
+			DebugLog("OnLogicRespSendGift ",msgSG.m_GiftID,msgSG.m_SendPID,msgSG.m_vecToPID.toString());
+			
+		}
+		
 		private function OnLogicGameState(msgdata:MsgData):void
 		{
 			var msgGS:Logic_GameState = new Logic_GameState();
@@ -3278,6 +3295,7 @@ package
 			
 			DebugLog("OnLogicSitPlayerInfo",msgSPI.m_SitID,msgSPI.m_PID);
 			
+			GlobleData.SetSitPlayerInfo(msgSPI);
 			var TempPI:Data_PlayerInfo = GetPlayerInfoByPID(msgSPI.m_PID);
 			if( TempPI != null )
 			{

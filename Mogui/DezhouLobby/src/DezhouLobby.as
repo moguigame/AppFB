@@ -85,6 +85,8 @@ package
 	import L2C.S2L_DoubleClickTable;
 	import L2C.S2L_Flag;
 	
+	import Logic.Logic_ReqSendGift;
+	
 	import MoGui.net.CLoadResource;
 	import MoGui.net.MsgData;
 	import MoGui.net.MsgDataEvent;
@@ -469,6 +471,8 @@ package
 			m_winShop = new Window_Shop();
 			addChild(m_winShop);
 			m_winShop.visible = false;
+			
+			GlobleData.StaticInitPlayerInfo();
 			
 			m_TimerGameTime.start();
 			ConnectToServer();			
@@ -984,6 +988,7 @@ package
 				case S2L_Flag.Shop:
 				{
 					var msgGameSG:Game_ReqSendGift = new Game_ReqSendGift();
+					var msgLogicSG:Logic_ReqSendGift = new Logic_ReqSendGift();
 					if( msgFlag.m_Value == Box_Shop.E_Close ){
 						m_winShop.visible = false;
 					}
@@ -998,6 +1003,15 @@ package
 						msgGameSG.m_SendPID = GlobleData.s_MyPID;
 						msgGameSG.m_arrayRecvPID.push(int(msgFlag.m_msgString));
 						m_gamesocket.SendMsg(msgGameSG);
+					}
+					else if( msgFlag.m_Value == Box_Shop.E_BuyPlayer ){						
+						msgLogicSG.m_GiftID  = m_winShop.m_boxShop.m_nSelectID;
+						msgLogicSG.m_SendPID = GlobleData.s_MyPID;
+						msgLogicSG.m_vecToPID.push(int(msgFlag.m_msgString));
+						ClientSengLogicMsg(msgLogicSG);
+					}
+					else if( msgFlag.m_Value == Box_Shop.E_BuyAllPlayer ){
+						
 					}
 				}
 				break;
@@ -1023,8 +1037,8 @@ package
 						if( nActionPID == m_MyData.m_PID ){
 							curPI = m_MyData;
 						}
-						else{
-							var TempPI:Data_PlayerInfo = GlobleData.GetPlayerInfoByPID(nActionPID);							
+						else if( nActionPID>0 ){
+							var TempPI:Data_PlayerInfo = GlobleData.GetPlayerInfoByPID(nActionPID);
 							if( TempPI == null ){
 								TempPI = new Data_PlayerInfo();
 								GlobleData.s_arrayPlayerInfo.push(TempPI);
@@ -1040,6 +1054,7 @@ package
 					else if( nActionFlag == CPlayerActon.E_SendGift ){
 						addChild(m_winShop);
 						m_winShop.visible = true;
+						m_winShop.m_boxShop.m_PIDSendPlayer = int(msgFlag.m_msgString);
 						m_winShop.m_boxShop.Show(GlobleData.m_BasePrice,Box_Shop.ShopType_Player);
 					}
 					else if( nActionFlag == CPlayerActon.E_AddFriend ){
@@ -2419,6 +2434,7 @@ package
 			var msgPBI:Game_PlayerBaseInfo = new Game_PlayerBaseInfo();
 			msgPBI.Read(msgData);
 			
+			GlobleData.SetPlayerBaseInfo(msgPBI);
 			if( msgPBI.m_PID==m_MyData.m_PID )
 			{		
 				DebugLog("OnPlayerBaseInfo 收到自已的信息 Flag="+msgPBI.m_Flag);

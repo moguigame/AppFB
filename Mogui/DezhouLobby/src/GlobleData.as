@@ -1,7 +1,13 @@
 package
 {
 	import Data.Data_GiftConfig;
+	import Data.Data_MaxPai;
 	import Data.Data_PlayerInfo;
+	
+	import Game.Game_PlayerBaseInfo;
+	
+	import Logic.Logic_GamePlayerInfo;
+	import Logic.Logic_SitPlayerInfo;
 	
 	import MoGui.net.CLoadResource;
 	import MoGui.utils.CFunction;
@@ -165,6 +171,47 @@ package
 				}
 			}
 			return retPI;
+		}
+		public static function SetSitPlayerInfo(msgInfo:Logic_SitPlayerInfo):void{
+			if( msgInfo.m_PID > 0 ){
+				var retPI:Data_PlayerInfo = GetPlayerInfoByPID(msgInfo.m_PID);
+				if( retPI == null ){
+					retPI = new Data_PlayerInfo();
+					retPI.m_PID = msgInfo.m_PID;
+					s_arrayPlayerInfo.push(retPI);
+				}
+				
+				retPI.m_GiftID      = msgInfo.m_GiftID;
+				retPI.m_SitID       = msgInfo.m_SitID;
+				
+				retPI.m_nJF         = msgInfo.m_nJF;
+				retPI.m_nEP         = msgInfo.m_nExperience;
+				retPI.m_nWinTimes   = msgInfo.m_nWinTimes;
+				retPI.m_nLossTimes  = msgInfo.m_nLossTimes;
+				retPI.m_MaxPai.Copy(msgInfo.m_dataMaxPai);
+				
+				retPI.m_GameLevel         = msgInfo.m_GameLevel;
+				retPI.m_VipLevel         = msgInfo.m_VipLevel;
+				retPI.m_Sex         = msgInfo.m_Sex;
+				retPI.m_HomePageURL         = msgInfo.m_HomePageURL;
+			}
+		}
+		public static function SetPlayerBaseInfo(msgInfo:Game_PlayerBaseInfo):void{
+			if( msgInfo.m_PID > 0 ){
+				var retPI:Data_PlayerInfo = GetPlayerInfoByPID(msgInfo.m_PID);
+				if( retPI == null ){
+					retPI = new Data_PlayerInfo();
+					retPI.m_PID = msgInfo.m_PID;
+					s_arrayPlayerInfo.push(retPI);
+				}
+				
+				retPI.m_AID         = msgInfo.m_AID;
+				retPI.m_nGameMoney       = msgInfo.m_nGameMoney;
+				retPI.m_PlayerState         = msgInfo.m_PlayerState;
+				retPI.m_GameLevel         = msgInfo.m_GameLevel;
+				retPI.m_NickName         = msgInfo.m_NickName;
+				retPI.m_HeadPicURL         = msgInfo.m_HeadPicURL;				
+			}			
 		}
 		
 		//用于存放礼物的配置信息
