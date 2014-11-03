@@ -34,6 +34,8 @@ package L2C
 		public static const ChildToParentStart:int                = 10000;
 		public static const XYID_C2P_Flag:int                     = ChildToParentStart + 1;
 		
+		public static const XYID_GAMESTAGE:int                    = 20000;
+		
 		public function LC_XieYiID()
 		{
 		}

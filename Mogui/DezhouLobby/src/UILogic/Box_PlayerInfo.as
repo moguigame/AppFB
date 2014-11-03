@@ -3,6 +3,7 @@ package UILogic
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Point;
 	
 	import Data.Data_PlayerInfo;
 	
@@ -12,6 +13,8 @@ package UILogic
 	
 	import MoGui.display.CLoadImage;
 	import MoGui.display.CText;
+	
+	import events.GameStageMsg;
 	
 	import ui.PlayerInfoUI;
 	
@@ -23,10 +26,14 @@ package UILogic
 		
 		public static var BTN_CLOSE:int       = 1;
 		public static var BTN_SENDGIFT:int    = 2;
-		public static var BNT_SELLGIFT:int    = 3;
+		public static var BTN_SELLGIFT:int    = 3;
+		public static var BTN_CHANGEGIFT:int  = 5;
 		
 		public var m_SamllHead:CLoadImage;
 		public var m_BigHead:CLoadImage;
+		
+		public var m_CurGiftID:int;
+		public var m_SetGiftIdx:int;
 		public var m_mcGift:MovieClip;
 		
 		public var m_spMaxPai:Sprite_MaxPai;
@@ -45,9 +52,12 @@ package UILogic
 		public var m_ListCurGift:List_PlayerGift;
 		public var m_ListPassGift:List_PlayerGift;
 		
+		public var m_TiShi:TimeShowTishi;
+		public var m_TimeMask:TimeMask;
+		
 		public function Box_PlayerInfo()
 		{
-			super();
+			super();		
 			
 			m_CurPID = 0;
 			
@@ -66,9 +76,7 @@ package UILogic
 			m_spMaxPai = new Sprite_MaxPai();
 			m_Info.addChild(m_spMaxPai);
 			m_spMaxPai.x = 270;
-			m_spMaxPai.y = 150;
-			
-			m_InfoData = new Data_PlayerInfo();
+			m_spMaxPai.y = 150;			
 			
 			m_arrayCurGift = new Array();
 			m_arrayPassGift = new Array();
@@ -93,6 +101,27 @@ package UILogic
 			m_ListPassGift.x = 2;
 			m_ListPassGift.y = 2;
 			
+			m_TiShi = new TimeShowTishi();
+			m_TiShi.m_tTishi.SetTextColor(0xff0000);
+			m_TiShi.m_tTishi.SetTextSize(18);			
+			m_TiShi.m_tTishi.SetCenterPoint(new Point(420,224));
+			addChild(m_TiShi);
+			m_TiShi.visible = false;
+			
+			m_TimeMask = new TimeMask(545,58);
+			addChild(m_TimeMask);
+			m_TimeMask.x = 147;
+			m_TimeMask.y = 398;
+			m_TimeMask.alpha = 0.1;
+			m_TimeMask.visible = false;
+			
+			m_CurGiftID = 0;
+			m_SetGiftIdx = 0;
+			m_mcGift = new MovieClip();
+			addChild(m_mcGift);
+			m_mcGift.x = -10;
+			m_mcGift.y = 30;
+			
 			m_tab.addEventListener(Event.SELECT,OnTabSelect);
 			m_tab.selectedIndex = 0;
 			
@@ -100,18 +129,85 @@ package UILogic
 			m_tabGift.selectedIndex = 0;
 			
 			m_btnClose.addEventListener(MouseEvent.CLICK,OnBtnClose);
-			
+			m_btnSetCurGift.addEventListener(MouseEvent.CLICK,OnSetGift);
 			m_btnSendGift.addEventListener(MouseEvent.CLICK,OnSendGift);
 			m_btnSellCurGift.addEventListener(MouseEvent.CLICK,OnSellCurGift);			
 			m_btnSellPassGift.addEventListener(MouseEvent.CLICK,OnSellPassGift);
+			
+			this.addEventListener(Event.ADDED_TO_STAGE, OnAddToStage);
+		}
+		private function OnAddToStage(evt:Event):void{
+			stage.addEventListener(GameStageMsg.EVENT_ID, OnGameStageMsg);
+		}
+		private function OnGameStageMsg(evt:GameStageMsg):void{
+			if( this.visible == false ){
+				return ;
+			}
+			if( evt.m_Value != m_CurPID ){
+				return ;
+			}
+			
+			if( evt.m_Flag == GameStageMsg.PlayerTail ){
+				Show(m_InfoData);
+			}
+			else if( (evt.m_Flag == GameStageMsg.PlayerGift || evt.m_Flag == GameStageMsg.PlayerGiftList) ){
+				if( m_tab.selectedIndex == s_Gift ){
+					UpdateCurGift();
+				}
+			}
+			else if( evt.m_Flag == GameStageMsg.RecvGift ){
+				if( m_tab.selectedIndex == s_Gift ){
+					UpdateCurGift();
+				}
+			}
+			else if( evt.m_Flag == GameStageMsg.SoldGift ){
+				if( m_tab.selectedIndex == s_Gift ){
+					if( m_GiftFlag == 0 ){
+						UpdateCurGift();
+					}
+					else if( m_GiftFlag == 1 ){
+						UpdatePassGift();
+					}
+				}
+				var nMoney:Number = Number(evt.m_msgString);
+				if( nMoney > 0 ){
+					m_TiShi.m_tTishi.SetText("卖出成功，获得 "+String(nMoney)+" 游戏币");
+					m_TiShi.ShowTime(1500);
+				}
+			}
+			else if( evt.m_Flag == GameStageMsg.ChangeGift ){
+				
+			}
+		}		
+		
+		private function OnSetGift(evt:MouseEvent):void{	
+			if( m_CurPID == GlobleData.s_MyPID && m_tab.selectedIndex == s_Gift && m_GiftFlag==0 
+				&& m_ListCurGift.selectedIndex>=0 && m_ListCurGift.selectedIndex<m_arrayCurGift.length ) {
+				var nGiftIdx:int = m_arrayCurGift[m_ListCurGift.selectedIndex].m_GiftIdx;
+				var nTempGiftID:int = m_arrayCurGift[m_ListCurGift.selectedIndex].m_GiftID;
+				if( nTempGiftID != m_CurGiftID ){
+					m_SetGiftIdx = nGiftIdx;
+					var TempClass:Class;
+					TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(nTempGiftID));
+					m_mcGift = new TempClass();
+					addChild(m_mcGift);
+					m_mcGift.x = -10;
+					m_mcGift.y = 30;
+				}
+				else{
+					m_SetGiftIdx = 0;
+				}				
+				
+				addChild(m_TimeMask);
+				m_TimeMask.ShowTime(1000);
+			}
 		}
 		
 		private function OnSendGift(evt:MouseEvent):void
 		{
 			if( m_CurPID == GlobleData.s_MyPID
 				&& m_tab.selectedIndex == s_Friend
-			    && m_ListFI.selectedIndex>=0 && m_ListFI.selectedIndex<m_arrayFriend.length ){
-				
+			    && m_ListFI.selectedIndex>=0 && m_ListFI.selectedIndex<m_arrayFriend.length ){				
 				var nRecvPID:int = m_arrayFriend[m_ListFI.selectedIndex].m_PID;
 				if( nRecvPID > 0 ){
 					var msgFlag:S2L_Flag = new S2L_Flag();
@@ -131,9 +227,12 @@ package UILogic
 				if( nGiftIdx > 0 ){
 					var msgFlag:S2L_Flag = new S2L_Flag();
 					msgFlag.m_Flag     = S2L_Flag.PlayerInfo;
-					msgFlag.m_Value    = BNT_SELLGIFT;
+					msgFlag.m_Value    = BTN_SELLGIFT;
 					msgFlag.m_msgString = String(nGiftIdx);
 					GlobleFunc.SendStageToLobby(stage,msgFlag);
+					
+					addChild(m_TimeMask);
+					m_TimeMask.ShowTime(1000);
 				}
 			}			
 		}
@@ -145,28 +244,46 @@ package UILogic
 				if( nGiftIdx > 0 ){
 					var msgFlag:S2L_Flag = new S2L_Flag();
 					msgFlag.m_Flag     = S2L_Flag.PlayerInfo;
-					msgFlag.m_Value    = BNT_SELLGIFT;
+					msgFlag.m_Value    = BTN_SELLGIFT;
 					msgFlag.m_msgString = String(nGiftIdx);
 					GlobleFunc.SendStageToLobby(stage,msgFlag);
+					
+					addChild(m_TimeMask);
+					m_TimeMask.ShowTime(1000);
 				}
 			}			
 		}
 		
 		public function Show(InfoData:Data_PlayerInfo):void
 		{
-			m_CurPID = InfoData.m_PID;
-			//m_InfoData.Copy(InfoData);
-			m_InfoData = InfoData;
+			if ( m_InfoData ){
+				m_CurGiftID = m_InfoData.m_GiftID;
+			}
+			
+			if( m_CurPID != InfoData.m_PID ){
+				m_CurPID = InfoData.m_PID;
+				m_InfoData = InfoData;
+			}
 			
 			if( m_CurPID != GlobleData.s_MyPID ){
 				m_btnFriend.visible = false;
 				m_btnPassGift.visible = false;
 			}
 			
-			m_SamllHead.SetPic(InfoData.m_HeadPicURL);	
+			m_SamllHead.SetPic(InfoData.m_HeadPicURL);
 			m_BigHead.SetPic(InfoData.m_HeadPicURL);
-			if( InfoData.m_GiftID ){
-				
+			
+			//InfoData.m_GiftID = 7;
+			if( InfoData.m_GiftID && InfoData.m_GiftID != m_CurGiftID ){				
+				var TempClass:Class;
+				TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(InfoData.m_GiftID));
+				m_mcGift = new TempClass();
+				addChild(m_mcGift);
+				m_mcGift.x = -10;
+				m_mcGift.y = 30;
+			}
+			else{
+				m_mcGift.visible = false;				
 			}
 			
 			m_spMaxPai.ShowMaxPai(InfoData.m_MaxPai.m_arrayPai);
@@ -215,8 +332,6 @@ package UILogic
 		}
 		public function UpdateCurGift():void
 		{
-			m_ListCurGift.selectedIndex = 0;
-			m_ListCurGift.scrollBar.value = 0;
 			m_arrayCurGift.splice(0,m_arrayCurGift.length);
 			for(var i:int=0;i<m_InfoData.m_arrayCurGift.length;++i){
 				var TempData:msgPlayerGiftInfo = new msgPlayerGiftInfo();
@@ -227,9 +342,7 @@ package UILogic
 			m_ListCurGift.dataSource = m_arrayCurGift;
 		}
 		public function UpdatePassGift():void
-		{
-			m_ListPassGift.selectedIndex = 0;
-			m_ListPassGift.scrollBar.value = 0;
+		{			
 			m_arrayPassGift.splice(0,m_arrayPassGift.length);
 			for(var i:int=0;i<m_InfoData.m_arrayPassGift.length;++i){
 				var TempData:msgPlayerGiftInfo = new msgPlayerGiftInfo();
@@ -249,7 +362,21 @@ package UILogic
 			}
 			else if( m_tab.selectedIndex == s_Gift ){
 				if( m_GiftFlag == - 1 ){
-					m_tabGift.selectedIndex = 0;
+					m_GiftFlag = m_tabGift.selectedIndex;
+					if( m_GiftFlag == 0 ){
+						
+						m_ListCurGift.selectedIndex = 0;
+						m_ListCurGift.scrollBar.value = 0;
+						
+						UpdateCurGift();
+					}
+					else if( m_GiftFlag == 1 ){
+						
+						m_ListPassGift.selectedIndex = 0;
+						m_ListPassGift.scrollBar.value = 0;
+						
+						UpdatePassGift();
+					}
 				}
 			}
 			else if( m_tab.selectedIndex == s_Friend ){
@@ -275,6 +402,18 @@ package UILogic
 			msgFlag.m_Flag       = S2L_Flag.PlayerInfo;
 			msgFlag.m_Value      = BTN_CLOSE;
 			GlobleFunc.SendStageToLobby(stage,msgFlag);
+			
+			if( m_SetGiftIdx > 0 ){				
+				msgFlag.m_Flag     = S2L_Flag.PlayerInfo;
+				msgFlag.m_Value    = BTN_CHANGEGIFT;
+				msgFlag.m_msgString = String(m_SetGiftIdx);
+				GlobleFunc.SendStageToLobby(stage,msgFlag);
+			}
+		}
+		public function OnTime(nTime:int):void
+		{
+			m_TiShi.OnTime(nTime);
+			m_TimeMask.OnTime(nTime);
 		}
 	}
 }

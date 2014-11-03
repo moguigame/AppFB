@@ -49,7 +49,10 @@ package
 	import Game.Game_PlayerMoguiMoney;
 	import Game.Game_PlayerStateInfo;
 	import Game.Game_PlayerStateInfoList;
+	import Game.Game_PlayerTailInfo;
+	import Game.Game_RecvGift;
 	import Game.Game_ReqChangeBank;
+	import Game.Game_ReqChangeGift;
 	import Game.Game_ReqCreateTable;
 	import Game.Game_ReqJoinRoom;
 	import Game.Game_ReqJoinTable;
@@ -57,7 +60,9 @@ package
 	import Game.Game_ReqRoomTableInfo;
 	import Game.Game_ReqSendGift;
 	import Game.Game_ReqSoldGift;
+	import Game.Game_ReqTailInfo;
 	import Game.Game_RespChangeBank;
+	import Game.Game_RespChangeGift;
 	import Game.Game_RespCreateTable;
 	import Game.Game_RespJoinRoom;
 	import Game.Game_RespJoinTable;
@@ -67,7 +72,6 @@ package
 	import Game.Game_RespSoldGift;
 	import Game.Game_RoomInfo;
 	import Game.Game_RoomInfoList;
-	import Game.Game_SendGift;
 	import Game.Game_ShowTable;
 	import Game.Game_ShowTableList;
 	import Game.Game_TableInfo;
@@ -121,6 +125,7 @@ package
 	import UILogic.Window_Shop;
 	
 	import events.ClientToLobby;
+	import events.GameStageMsg;
 	import events.LobbyToClient;
 	import events.StageToLobby;
 	
@@ -183,7 +188,6 @@ package
 		
 		public  var m_MyData:Data_PlayerInfo;
 		private var m_webPrama:Data_WebPrama;
-		private var m_arrayPlayerInfo:Vector.<Data_PlayerInfo>;
 		private var m_arrayRoomInfo:Vector.<Data_RoomInfo>;
 		
 		public function DezhouLobby()
@@ -198,13 +202,15 @@ package
 			m_arrayMsgToClient = new Vector.<MsgData>();
 			m_GameClient = null;
 			
+			GlobleData.StaticInitPlayerInfo();
+			
 			m_TabPlace = 0;
 			m_TabFlag = DeZhouDef.TabFlag_Common;
 			m_arrayRoomInfo = new Vector.<Data_RoomInfo>();
 			
 			m_webPrama = new Data_WebPrama();
 			m_MyData = new Data_PlayerInfo();
-			m_arrayPlayerInfo = new Vector.<Data_PlayerInfo>();
+			GlobleData.s_arrayPlayerInfo.push(m_MyData);
 			
 			m_TimerGameTime.addEventListener(TimerEvent.TIMER, OnTimer);
 		}
@@ -216,6 +222,8 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.showDefaultContextMenu = false;
 			stage.color = 0x777777;
+			
+			GlobleFunc.SetStage(this.stage);
 			
 			//背景的处理
 			stage.addEventListener(Event.RESIZE,OnBackResize);
@@ -470,9 +478,7 @@ package
 			
 			m_winShop = new Window_Shop();
 			addChild(m_winShop);
-			m_winShop.visible = false;
-			
-			GlobleData.StaticInitPlayerInfo();
+			m_winShop.visible = false;			
 			
 			m_TimerGameTime.start();
 			ConnectToServer();			
@@ -667,6 +673,7 @@ package
 			m_winBank.m_boxbank.OnTime(TempTime);
 			m_winCreateTable.m_boxCreateTable.OnTime(TempTime);
 			m_winShop.m_boxShop.OnTime(TempTime);
+			m_winPlayerInfo.m_boxInfo.OnTime(TempTime);
 		}	
 		
 		//供客户端调用
@@ -993,19 +1000,19 @@ package
 						m_winShop.visible = false;
 					}
 					else if( msgFlag.m_Value == Box_Shop.E_BuySelf ){
-						msgGameSG.m_GiftID  = m_winShop.m_boxShop.m_nSelectID;
+						msgGameSG.m_GiftID  = m_winShop.m_boxShop.m_nSelectGiftID;
 						msgGameSG.m_SendPID = GlobleData.s_MyPID;
 						msgGameSG.m_arrayRecvPID.push(int(msgFlag.m_msgString));
 						m_gamesocket.SendMsg(msgGameSG);
 					}
 					else if( msgFlag.m_Value == Box_Shop.E_BuyFriend ){
-						msgGameSG.m_GiftID  = m_winShop.m_boxShop.m_nSelectID;
+						msgGameSG.m_GiftID  = m_winShop.m_boxShop.m_nSelectGiftID;
 						msgGameSG.m_SendPID = GlobleData.s_MyPID;
 						msgGameSG.m_arrayRecvPID.push(int(msgFlag.m_msgString));
 						m_gamesocket.SendMsg(msgGameSG);
 					}
-					else if( msgFlag.m_Value == Box_Shop.E_BuyPlayer ){						
-						msgLogicSG.m_GiftID  = m_winShop.m_boxShop.m_nSelectID;
+					else if( msgFlag.m_Value == Box_Shop.E_BuyPlayer ){
+						msgLogicSG.m_GiftID  = m_winShop.m_boxShop.m_nSelectGiftID;
 						msgLogicSG.m_SendPID = GlobleData.s_MyPID;
 						msgLogicSG.m_vecToPID.push(int(msgFlag.m_msgString));
 						ClientSengLogicMsg(msgLogicSG);
@@ -1035,7 +1042,12 @@ package
 					if( nActionFlag == CPlayerActon.E_TailInfo ){
 						var curPI:Data_PlayerInfo = null;
 						if( nActionPID == m_MyData.m_PID ){
-							curPI = m_MyData;
+							curPI = m_MyData;							
+							if( curPI.HaveGift()==false ){
+								var msgReqGift:Game_ReqPlayerGiftInfo = new Game_ReqPlayerGiftInfo();
+								msgReqGift.m_PID = m_MyData.m_PID;
+								m_gamesocket.SendMsg(msgReqGift);
+							}							
 						}
 						else if( nActionPID>0 ){
 							var TempPI:Data_PlayerInfo = GlobleData.GetPlayerInfoByPID(nActionPID);
@@ -1046,6 +1058,12 @@ package
 							curPI = TempPI;
 						}
 						if( curPI ){
+							if( curPI.HaveTailInfo() == false ){
+								var msgRTI:Game_ReqTailInfo = new Game_ReqTailInfo();
+								msgRTI.m_nValue = nActionPID;
+								msgRTI.m_Flag   = Game_ReqTailInfo.TailInfo | Game_ReqTailInfo.GiftInfo | Game_ReqTailInfo.HonorInfo ;
+								m_gamesocket.SendMsg(msgRTI);
+							}
 							addChild(m_winPlayerInfo);
 							m_winPlayerInfo.visible = true;
 							m_winPlayerInfo.m_boxInfo.Show(curPI);
@@ -1092,11 +1110,10 @@ package
 					addChild(m_winPlayerInfo);
 					m_winPlayerInfo.visible = true;
 					m_winPlayerInfo.m_boxInfo.Show(m_MyData);
-					if( m_MyData.m_arrayCurGift.length + m_MyData.m_arrayPassGift.length == 0 )
-					{
-						var msgReqGift:Game_ReqPlayerGiftInfo = new Game_ReqPlayerGiftInfo();
-						msgReqGift.m_PID = m_MyData.m_PID;
-						m_gamesocket.SendMsg(msgReqGift);
+					if( m_MyData.HaveGift()==false ){
+						var TempReqGift:Game_ReqPlayerGiftInfo = new Game_ReqPlayerGiftInfo();
+						TempReqGift.m_PID = m_MyData.m_PID;
+						m_gamesocket.SendMsg(TempReqGift);
 					}
 					break;
 				case S2L_Flag.CreateTable_Close:
@@ -1116,12 +1133,19 @@ package
 						var nRecvPID:int = int(msgFlag.m_msgString);
 						m_winShop.m_boxShop.m_PIDSendFriend = nRecvPID;
 					}
-					else if( nValue == Box_PlayerInfo.BNT_SELLGIFT ){
+					else if( nValue == Box_PlayerInfo.BTN_SELLGIFT ){
 						var nGiftIdx:int = int(msgFlag.m_msgString);
 						var msgSG:Game_ReqSoldGift = new Game_ReqSoldGift();
 						msgSG.m_SoldPID = m_MyData.m_PID;
 						msgSG.m_arrayGiftIdx.push(nGiftIdx);
 						m_gamesocket.SendMsg(msgSG);
+					}
+					else if( nValue == Box_PlayerInfo.BTN_CHANGEGIFT ){
+						var nChangeGiftIdx:int = int(msgFlag.m_msgString);
+						var msgCG:Game_ReqChangeGift = new Game_ReqChangeGift();
+						msgCG.m_PID     = m_MyData.m_PID;
+						msgCG.m_GiftIdx = nChangeGiftIdx;
+						m_gamesocket.SendMsg(msgCG);
 					}
 				}
 				break;
@@ -1422,9 +1446,9 @@ package
 					OnRespSendGift(msgData);
 				}
 				break;
-				case Game_SendGift.ID:
+				case Game_RecvGift.ID:
 				{
-					OnSendGift(msgData);
+					OnRecvGift(msgData);
 				}
 				break;
 				case Game_PlayerGiftInfo.ID:
@@ -1440,6 +1464,11 @@ package
 				case Game_RespSoldGift.ID:
 				{
 					OnRespSoldGift(msgData);
+				}
+				break;
+				case Game_RespChangeGift.ID:
+				{
+					OnRespChangeGift(msgData);
 				}
 				break;
 				case Game_TableInfoList.ID:
@@ -1470,6 +1499,11 @@ package
 				case Game_MaxMoney.ID:
 				{
 					OnMaxMoney(msgData);
+				}
+				break;
+				case Game_PlayerTailInfo.ID:
+				{
+					OnPlayerTailInfo(msgData);
 				}
 				break;
 				case Game_RespJoinRoom.ID:
@@ -2060,6 +2094,17 @@ package
 			msgMM.Read(msgData);
 		}
 		
+		private function OnPlayerTailInfo(msgData:MsgData):void
+		{
+			DebugLog("OnPlayerTailInfo");
+			
+			var msgTI:Game_PlayerTailInfo = new Game_PlayerTailInfo();
+			msgTI.Read(msgData);
+			
+			GlobleData.SetPlayerTailInfo(msgTI);
+			GlobleFunc.SendGameStageMsg(GameStageMsg.PlayerTail,msgTI.m_PID,"");			
+		}		
+		
 		private function OnShowTable(msgData:MsgData):void
 		{
 			DebugLog("OnShowTable");
@@ -2223,11 +2268,13 @@ package
 			var msgPHIL:Game_PlayerHonorInfoList = new Game_PlayerHonorInfoList();
 			msgPHIL.Read(msgData);
 			
-			if( msgPHIL.m_PID==m_MyData.m_PID )
-			{
+			if( msgPHIL.m_PID==m_MyData.m_PID ){
 				DebugLog("OnPlayerHonorInfoList 收到自已的信息");
-				m_MyData.SetHonorInfo(msgPHIL.m_ArrayHonorID);				
+				m_MyData.SetHonorInfo(msgPHIL.m_ArrayHonorID);	
 			}
+			
+			GlobleData.SetPlayerHonorInfo(msgPHIL);
+			GlobleFunc.SendGameStageMsg(GameStageMsg.PlayerHonorList,msgPHIL.m_PID,"");
 		}
 		
 		private function OnRespSendGift(msgData:MsgData):void
@@ -2237,22 +2284,19 @@ package
 			var msgRespSG:Game_RespSendGift = new Game_RespSendGift();
 			msgRespSG.Read(msgData);
 			
-			if( m_winShop.m_boxShop.visible && msgRespSG.m_Flag==DeZhouDef.MsgFlag_Success ){
-				if( m_winShop.m_boxShop.m_SendType == Box_Shop.ShopType_MySelf){
-					m_winShop.m_boxShop.m_TiShi.m_tTishi.SetText("购买成功");
-				}
-				else{
-					m_winShop.m_boxShop.m_TiShi.m_tTishi.SetText("赠送成功");
-				}
-				m_winShop.m_boxShop.m_TiShi.ShowTime(3000);
-			}
+			GlobleFunc.SendGameStageMsg(GameStageMsg.RespGameSengGift,msgRespSG.m_Flag,String(msgRespSG.m_SendPID));
 		}
-		private function OnSendGift(msgData:MsgData):void
+		private function OnRecvGift(msgData:MsgData):void
 		{
-			DebugLog("OnSendGift");
+			DebugLog("OnRecvGift");
 			
-			var msgSG:Game_SendGift = new Game_SendGift();
-			msgSG.Read(msgData);			
+			var msgSG:Game_RecvGift = new Game_RecvGift();
+			msgSG.Read(msgData);
+			
+			//m_MyData.AddGiftInfo(msgSG.m_GiftInfo,);
+			
+			GlobleData.AddPlayerGift(msgSG);
+			GlobleFunc.SendGameStageMsg(GameStageMsg.RecvGift,msgSG.m_RecvPID,"");
 		}
 		
 		private function OnPlayerGiftInfo(msgData:MsgData):void
@@ -2267,13 +2311,7 @@ package
 				curPI = m_MyData;
 			}
 			else{
-				var TempPI:Data_PlayerInfo = null;
-				for(var Idx:int=0;Idx<GlobleData.s_arrayPlayerInfo.length;++Idx){
-					if( GlobleData.s_arrayPlayerInfo[Idx].m_PID == msgGI.m_PID ){
-						TempPI = GlobleData.s_arrayPlayerInfo[Idx];
-						break;
-					}
-				}
+				var TempPI:Data_PlayerInfo = GlobleData.GetPlayerInfoByPID(msgGI.m_PID);
 				if( TempPI == null ){
 					TempPI = new Data_PlayerInfo();
 					GlobleData.s_arrayPlayerInfo.push(TempPI);
@@ -2281,59 +2319,52 @@ package
 				curPI = TempPI;
 			}
 			if( curPI ){
-				curPI.AddGiftInfo(msgGI.m_msgGift,DeZhouDef.CurGift);
+				curPI.AddGiftInfo(msgGI.m_msgGift,DeZhouDef.CurGift);				
+				GlobleFunc.SendGameStageMsg(GameStageMsg.PlayerGift,msgGI.m_PID,"");
 			}
 		}
-		private function OnPlayerGiftInfoList(msgData:MsgData):void
-		{
+		private function OnPlayerGiftInfoList(msgData:MsgData):void{
 			DebugLog("OnPlayerGiftInfoList");
 			
 			var msgGIL:Game_PlayerGiftInfoList = new Game_PlayerGiftInfoList();
 			msgGIL.Read(msgData);
 			
-			var curPI:Data_PlayerInfo;
-			
-			var i:int=0;
-			if( msgGIL.m_PID == m_MyData.m_PID ){
-				for(i=0;i<msgGIL.m_arrayGiftInfo.length;++i){
-					m_MyData.AddGiftInfo(msgGIL.m_arrayGiftInfo[i],msgGIL.m_Flag);
-				}
-				curPI = m_MyData;
+			var TempPI:Data_PlayerInfo = GlobleData.GetPlayerInfoByPID(msgGIL.m_PID);
+			if( TempPI == null ){
+				TempPI = new Data_PlayerInfo();
+				GlobleData.s_arrayPlayerInfo.push(TempPI);
 			}
-			else{
-				var TempPI:Data_PlayerInfo = null;
-				for(var Idx:int=0;Idx<GlobleData.s_arrayPlayerInfo.length;++Idx){
-					if( GlobleData.s_arrayPlayerInfo[Idx].m_PID == msgGIL.m_PID ){
-						TempPI = GlobleData.s_arrayPlayerInfo[Idx];
-						break;
-					}
-				}
-				if( TempPI == null ){
-					TempPI = new Data_PlayerInfo();
-					GlobleData.s_arrayPlayerInfo.push(TempPI);
-				}
-				for(i=0;i<msgGIL.m_arrayGiftInfo.length;++i){
-					TempPI.AddGiftInfo(msgGIL.m_arrayGiftInfo[i],msgGIL.m_Flag);
-				}
-				curPI = TempPI;
+			for(var i:int=0;i<msgGIL.m_arrayGiftInfo.length;++i){
+				TempPI.AddGiftInfo(msgGIL.m_arrayGiftInfo[i],msgGIL.m_Flag);
 			}
-			if( m_winPlayerInfo.visible && m_winPlayerInfo.m_boxInfo.m_CurPID==curPI.m_PID ){
-				m_winPlayerInfo.m_boxInfo.UpdateCurGift();
-				if( curPI.m_PID == m_MyData.m_PID ){
-					m_winPlayerInfo.m_boxInfo.UpdatePassGift();
-				}
-			}
+
+			if( TempPI ){
+				GlobleFunc.SendGameStageMsg(GameStageMsg.PlayerGift,msgGIL.m_PID,"");
+			}			
 		}
 		private function OnRespSoldGift(msgData:MsgData):void
 		{
 			DebugLog("OnRespSoldGift");
 			
-			var msgGIL:Game_RespSoldGift = new Game_RespSoldGift();
-			msgGIL.Read(msgData);
+			var msgSG:Game_RespSoldGift = new Game_RespSoldGift();
+			msgSG.Read(msgData);
 			
-			if( m_winPlayerInfo.visible ){
-				
-			}			
+			if( msgSG.m_SoldPID == m_MyData.m_PID ){
+				for(var i:int=0;i<msgSG.m_arraySoldIdx.length;++i){
+					m_MyData.DeleteGiftInfo(msgSG.m_arraySoldIdx[i]);
+				}
+				GlobleFunc.SendGameStageMsg(GameStageMsg.SoldGift,msgSG.m_SoldPID,String(msgSG.m_nMoney) );
+			}
+		}
+		private function OnRespChangeGift(msgData:MsgData):void{
+			DebugLog("OnRespChangeGift");
+			
+			var msgCG:Game_RespChangeGift = new Game_RespChangeGift();
+			msgCG.Read(msgData);
+			
+			if( msgCG.m_nFlag == 0 ){
+				GlobleFunc.SendGameStageMsg(GameStageMsg.ChangeGift,msgCG.m_PID,String(msgCG.m_GiftID) );
+			}
 		}
 		private function OnPlayerGameMoney(msgData:MsgData):void
 		{
@@ -2765,6 +2796,7 @@ package
 				
 				m_MyData.m_AID = msgRLC.m_AID;
 				m_MyData.m_PID = msgRLC.m_PID;
+				m_MyData = GlobleData.GetPlayerInfoByPID(msgRLC.m_PID);
 			}
 			else
 			{

@@ -41,7 +41,7 @@ package Data
 		public var m_arrayHonor:Vector.<int>;
 		
 		public var m_arrayCurGift:Vector.<msgPlayerGiftInfo>;
-		public var m_arrayPassGift:Vector.<msgPlayerGiftInfo>;		
+		public var m_arrayPassGift:Vector.<msgPlayerGiftInfo>;
 		public var m_arrayFriendInfo:Vector.<Data_FriendInfo>;
 		
 		//玩家状态信息
@@ -213,9 +213,9 @@ package Data
 			}
 		}
 		
-		public function DeleteGiftInfo(Idx:int,nFlag:int):void
+		public function DeleteGiftInfo(Idx:int,nFlag:int=0):void
 		{
-			if( nFlag == DeZhouDef.CurGift )
+			//if( nFlag == DeZhouDef.CurGift )
 			{
 				while(true)
 				{
@@ -238,7 +238,7 @@ package Data
 					}
 				}
 			}
-			else if( nFlag == DeZhouDef.PassGift )
+			//else if( nFlag == DeZhouDef.PassGift )
 			{
 				while(true)
 				{
@@ -330,5 +330,11 @@ package Data
 				}
 			}
 		}
+		public function HaveTailInfo():Boolean{
+			return (m_MaxMoney+m_MaxWin) > 0;
+		}
+		public function HaveGift():Boolean{
+			return (m_arrayCurGift.length + m_arrayPassGift.length) > 0;
+		}		
 	}
 }

@@ -1,12 +1,13 @@
 package
 {
 	import Data.Data_GiftConfig;
-	import Data.Data_MaxPai;
 	import Data.Data_PlayerInfo;
 	
 	import Game.Game_PlayerBaseInfo;
+	import Game.Game_PlayerHonorInfoList;
+	import Game.Game_PlayerTailInfo;
+	import Game.Game_RecvGift;
 	
-	import Logic.Logic_GamePlayerInfo;
 	import Logic.Logic_SitPlayerInfo;
 	
 	import MoGui.net.CLoadResource;
@@ -190,10 +191,10 @@ package
 				retPI.m_nLossTimes  = msgInfo.m_nLossTimes;
 				retPI.m_MaxPai.Copy(msgInfo.m_dataMaxPai);
 				
-				retPI.m_GameLevel         = msgInfo.m_GameLevel;
-				retPI.m_VipLevel         = msgInfo.m_VipLevel;
-				retPI.m_Sex         = msgInfo.m_Sex;
-				retPI.m_HomePageURL         = msgInfo.m_HomePageURL;
+				retPI.m_GameLevel      = msgInfo.m_GameLevel;
+				retPI.m_VipLevel       = msgInfo.m_VipLevel;
+				retPI.m_Sex            = msgInfo.m_Sex;
+				retPI.m_HomePageURL    = msgInfo.m_HomePageURL;
 			}
 		}
 		public static function SetPlayerBaseInfo(msgInfo:Game_PlayerBaseInfo):void{
@@ -205,13 +206,55 @@ package
 					s_arrayPlayerInfo.push(retPI);
 				}
 				
-				retPI.m_AID         = msgInfo.m_AID;
-				retPI.m_nGameMoney       = msgInfo.m_nGameMoney;
-				retPI.m_PlayerState         = msgInfo.m_PlayerState;
-				retPI.m_GameLevel         = msgInfo.m_GameLevel;
-				retPI.m_NickName         = msgInfo.m_NickName;
-				retPI.m_HeadPicURL         = msgInfo.m_HeadPicURL;				
-			}			
+				retPI.m_AID = msgInfo.m_AID;
+				retPI.SetPlayerBaseInfo(msgInfo);			
+			}
+		}
+		public static function SetPlayerTailInfo(msgInfo:Game_PlayerTailInfo):void{
+			if( msgInfo.m_PID > 0 ){
+				var retPI:Data_PlayerInfo = GetPlayerInfoByPID(msgInfo.m_PID);
+				if( retPI == null ){
+					retPI = new Data_PlayerInfo();
+					retPI.m_PID = msgInfo.m_PID;
+					s_arrayPlayerInfo.push(retPI);
+				}
+				
+				retPI.m_JoinTime         = msgInfo.m_JoinTime;
+				
+				retPI.m_MaxMoneyTime     = msgInfo.m_MaxMoneyTime;
+				retPI.m_MaxMoney         = msgInfo.m_MaxOwnMoney;
+				retPI.m_MaxWinTime       = msgInfo.m_MaxWinTime;
+				retPI.m_MaxWin           = msgInfo.m_MaxWinMoney;		
+
+				retPI.m_FriendCount      = msgInfo.m_FriendCount;
+				retPI.m_nWinTimes        = msgInfo.m_nWinTimes;
+				retPI.m_nLossTimes       = msgInfo.m_nLossTimes;
+				
+				retPI.m_MaxPaiTime       = msgInfo.m_MaxPaiTime;
+				retPI.m_MaxPai.Copy(msgInfo.m_dataMaxPai);
+			}
+		}
+		public static function  SetPlayerHonorInfo(msgInfo:Game_PlayerHonorInfoList):void{
+			if( msgInfo.m_PID > 0 ){
+				var retPI:Data_PlayerInfo = GetPlayerInfoByPID(msgInfo.m_PID);
+				if( retPI == null ){
+					retPI = new Data_PlayerInfo();
+					retPI.m_PID = msgInfo.m_PID;
+					s_arrayPlayerInfo.push(retPI);
+				}
+				retPI.SetHonorInfo(msgInfo.m_ArrayHonorID);
+			}
+		}		
+		public static function AddPlayerGift(msgInfo:Game_RecvGift):void{
+			if( msgInfo.m_RecvPID > 0 ){
+				var retPI:Data_PlayerInfo = GetPlayerInfoByPID(msgInfo.m_RecvPID);
+				if( retPI == null ){
+					retPI = new Data_PlayerInfo();
+					retPI.m_PID = msgInfo.m_RecvPID;
+					s_arrayPlayerInfo.push(retPI);
+				}
+				retPI.AddGiftInfo(msgInfo.m_GiftInfo,DeZhouDef.CurGift);
+			}
 		}
 		
 		//用于存放礼物的配置信息

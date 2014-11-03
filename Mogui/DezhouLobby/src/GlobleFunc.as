@@ -6,11 +6,17 @@ package
 	import PublicXY.Public_XYBase;
 	
 	import events.ChildToParent;
+	import events.GameStageMsg;
 	import events.StageToClient;
 	import events.StageToLobby;
 
 	public class GlobleFunc
 	{
+		private static var m_Stage:Stage;
+		public static function SetStage(sg:Stage):void{
+			m_Stage = sg;
+		}
+		
 		public static function LogError(...args):void
 		{
 			trace( new Date().toLocaleTimeString(),"Log ?????????????????????",args );
@@ -45,6 +51,16 @@ package
 				msg.Write(evtC2P.m_msgData);
 				evtC2P.m_msgData.ResetDataPosition();
 				sp.dispatchEvent(evtC2P);
+			}
+		}
+		public static function SendGameStageMsg(nFlag:int,nValue:int,msgString:String):void
+		{			
+			if( m_Stage != null ){				
+				var msgEvt:GameStageMsg = new GameStageMsg();
+				msgEvt.m_Flag      = nFlag;
+				msgEvt.m_Value     = nValue;
+				msgEvt.m_msgString = msgString;
+				m_Stage.dispatchEvent(msgEvt);
 			}
 		}
 		

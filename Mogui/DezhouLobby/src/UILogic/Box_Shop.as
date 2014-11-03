@@ -11,6 +11,8 @@ package UILogic
 	
 	import L2C.S2L_Flag;
 	
+	import events.GameStageMsg;
+	
 	import ui.ShopUI;
 	
 	public class Box_Shop extends ShopUI
@@ -40,7 +42,7 @@ package UILogic
 		public var m_arrayShowGC:Array;
 		public var m_listGift:List_GiftShop;
 		
-		public var m_nSelectID:int;
+		public var m_nSelectGiftID:int;
 		public var m_mcGift:MovieClip;		
 		
 		public var m_SendType:int;
@@ -88,7 +90,7 @@ package UILogic
 			m_listGift.y = 60;
 			m_listGift.addEventListener(Event.SELECT,OnSelectGift);
 			
-			m_nSelectID = 0;
+			m_nSelectGiftID = 0;
 			m_mcGift = null;
 			
 			m_SendType = ShopType_None;
@@ -109,6 +111,36 @@ package UILogic
 			var TempInfoLoad:URLLoader = new URLLoader();
 			TempInfoLoad.load(new URLRequest("xml/dezhou_info_gift.xml?"+Math.random()));
 			TempInfoLoad.addEventListener(Event.COMPLETE, OnLoadXMLComplete);
+			
+			this.addEventListener(Event.ADDED_TO_STAGE, OnAddToStage);
+		}
+		private function OnAddToStage(evt:Event):void{
+			stage.addEventListener(GameStageMsg.EVENT_ID, OnGameStageMsg);
+		}
+		private function OnGameStageMsg(evt:GameStageMsg):void{
+			if( this.visible == false ){
+				return ;
+			}
+			if( evt.m_Flag == GameStageMsg.RespGameSengGift ){				
+				if( evt.m_Value == DeZhouDef.MsgFlag_Success ){
+					if( m_SendType == ShopType_MySelf ){
+						m_TiShi.m_tTishi.SetText("自已购买成功");
+					}
+					else if( m_SendType == ShopType_Friend ){
+						m_TiShi.m_tTishi.SetText("赠送好友成功");
+					}					
+					else{
+						m_TiShi.m_tTishi.SetText("赠送玩家成功");
+					}					
+				}
+				else{
+					var strRet:String = "购买礼物失败";
+					if( evt.m_Value == 1 ){
+						"购买礼物失败，游戏币不足";
+					}
+				}
+				m_TiShi.ShowTime(3000);
+			}
 		}
 		
 		private function OnSelectGift(evt:Event):void
@@ -116,7 +148,7 @@ package UILogic
 			var nSelectIndex:int = m_listGift.selectedIndex;
 			if( nSelectIndex>=0 && nSelectIndex<m_arrayShowGC.length ){
 				var gcSelect:Data_GiftConfig = m_arrayShowGC[nSelectIndex];
-				m_nSelectID = gcSelect.m_GiftID;
+				m_nSelectGiftID = gcSelect.m_GiftID;
 				
 				m_tName.text = gcSelect.m_GiftName;
 				m_tName.visible = true;
@@ -135,7 +167,7 @@ package UILogic
 				m_tLastTime.visible = true;
 				
 				var TempClass:Class;
-				TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(m_nSelectID));
+				TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(m_nSelectGiftID));
 				if( m_mcGift && m_mcGift.parent ){
 					this.removeChild(m_mcGift);
 				}
@@ -148,7 +180,7 @@ package UILogic
 			}
 			else
 			{
-				m_nSelectID = 0;
+				m_nSelectGiftID = 0;
 				if( m_mcGift ){
 					m_mcGift.visible = false;
 				}
@@ -162,7 +194,7 @@ package UILogic
 		private function OnBtnBuySelf(evt:MouseEvent):void
 		{
 			if( m_SendType == ShopType_MySelf ){
-				if( m_nSelectID > 0 ){
+				if( m_nSelectGiftID > 0 ){
 					addChild(m_TimeMask);
 					m_TimeMask.ShowTime(500);
 					
@@ -183,7 +215,7 @@ package UILogic
 		private function OnBtnSendFriend(evt:MouseEvent):void
 		{
 			if( m_SendType == ShopType_Friend && m_PIDSendFriend>0 ){
-				if( m_nSelectID > 0 ){
+				if( m_nSelectGiftID > 0 ){
 					addChild(m_TimeMask);
 					m_TimeMask.ShowTime(500);
 					
@@ -204,7 +236,7 @@ package UILogic
 		private function OnBtnSendPlayer(evt:MouseEvent):void
 		{
 			if( m_SendType == ShopType_Player && m_PIDSendPlayer>0 ){
-				if( m_nSelectID > 0 ){
+				if( m_nSelectGiftID > 0 ){
 					addChild(m_TimeMask);
 					m_TimeMask.ShowTime(500);
 					

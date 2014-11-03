@@ -10,7 +10,7 @@ package Game
 		
 		public static const TailInfo:int     = 1;
 		public static const GiftInfo:int     = 2;
-		public static const HonorInfo:int    = 4;		
+		public static const HonorInfo:int    = 4;
 		
 		public var m_Flag:int;
 		public var m_nValue:int;
@@ -25,7 +25,7 @@ package Game
 		
 		override public function Write(msgdata:MsgData):void
 		{
-			msgdata.m_msgID = ID;			
+			msgdata.m_msgID = ID;
 			msgdata.WriteByte(m_Flag);
 			msgdata.WriteInt(m_nValue);
 		}

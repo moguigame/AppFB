@@ -60,8 +60,7 @@ package Game
 		public static const GameLobbyXYID_ReqTailInfo:int         = Public_XYDef.MOGUI_FIRST_CLIENT_GAMELOBBY + 60;
 		public static const GameLobbyXYID_ReqPlayerGiftInfo:int   = Public_XYDef.MOGUI_FIRST_CLIENT_GAMELOBBY + 61;
 		public static const GameLobbyXYID_PlayerGiftInfo:int      = Public_XYDef.MOGUI_FIRST_CLIENT_GAMELOBBY + 62;
-		public static const GameLobbyXYID_PlayerGiftInfoList:int  = Public_XYDef.MOGUI_FIRST_CLIENT_GAMELOBBY + 63;
-		
+		public static const GameLobbyXYID_PlayerGiftInfoList:int  = Public_XYDef.MOGUI_FIRST_CLIENT_GAMELOBBY + 63;		
 		public static const GameLobbyXYID_PlayerHonorInfoList:int = Public_XYDef.MOGUI_FIRST_CLIENT_GAMELOBBY + 64;
 		public static const GameLobbyXYID_PlayerTailInfo:int      = Public_XYDef.MOGUI_FIRST_CLIENT_GAMELOBBY + 65;
 		

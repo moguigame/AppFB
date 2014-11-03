@@ -13,13 +13,15 @@ package Game
 		public var m_PID:int;
 		public var m_JoinTime:int;
 		public var m_LandTime:int;
+		public var m_MaxMoneyTime:int;
 		public var m_MaxOwnMoney:Number;
+		public var m_MaxWinTime:int;
 		public var m_MaxWinMoney:Number;
 		
 		public var m_FriendCount:int;
 		public var m_nWinTimes:int;
 		public var m_nLossTimes:int;
-		
+		public var m_MaxPaiTime:int;
 		public var m_dataMaxPai:Data_MaxPai;
 		
 		public var m_HonorCount:int;
@@ -50,13 +52,16 @@ package Game
 			m_JoinTime = msgdata.ReadInt();
 			m_LandTime = msgdata.ReadInt();
 			
+			m_MaxMoneyTime = msgdata.ReadInt();
 			m_MaxOwnMoney = msgdata.ReadBigNumber();
+			m_MaxWinTime = msgdata.ReadInt();
 			m_MaxWinMoney = msgdata.ReadBigNumber();
 			
 			m_FriendCount = msgdata.ReadShort();
 			m_nWinTimes = msgdata.ReadInt();
 			m_nLossTimes = msgdata.ReadInt();
 			
+			m_MaxPaiTime = msgdata.ReadInt();
 			m_dataMaxPai.Read(msgdata);
 			
 			m_HonorCount = msgdata.ReadByte();
