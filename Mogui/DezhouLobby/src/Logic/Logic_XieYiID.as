@@ -51,8 +51,8 @@ package Logic
 		
 		public static const GameXYID_SendGift:int                      = LogicXYIDStart+131;
 		public static const GameXYID_RespSendGift:int                  = LogicXYIDStart+132;
-		public static const GameXYID_ReqChangGift:int                  = LogicXYIDStart+133;
-		public static const GameXYID_RespChangGift:int                 = LogicXYIDStart+134;
+		//public static const GameXYID_ReqChangGift:int                  = LogicXYIDStart+133;
+		//public static const GameXYID_RespChangGift:int                 = LogicXYIDStart+134;
 		
 		public static const GameXYID_PromoteTime:int                   = LogicXYIDStart+141;
 		

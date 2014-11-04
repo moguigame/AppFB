@@ -191,13 +191,16 @@ package UILogic
 					m_mcGift.visible = false;
 				}
 			}
-			else if( GID != m_GiftID ){				
+			else if( GID != m_GiftID ){			
 				var TempClass:Class;
-				TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(GID));				
+				TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(GID));	
+				this.removeChild(m_mcGift);
 				m_mcGift = new TempClass();
 				addChild(m_mcGift);
 				m_mcGift.visible = true;
-			}			
+				m_mcGift.x = -45;
+				m_mcGift.y = 10;
+			}
 		}
 		
 		public function SetTableMoney(nMoney:Number):void
@@ -329,14 +332,13 @@ package UILogic
 				m_HeadPic.url           = dataGamePlayer.m_HeadPicURL;
 				m_GameState             = dataGamePlayer.m_PlayerGameState;
 				m_MatchRank             = dataGamePlayer.m_MatchRank;
-				m_GiftID                = dataGamePlayer.m_GiftID;
 				
 				m_spWashOut.visible = (m_GameState == DeZhouDef.GAME_PLAYER_ST_WASHOUT);
 				
 				SetNickName(dataGamePlayer.m_NickName);
 				SetTableMoney(dataGamePlayer.m_TableMoney);
 				SetAction(dataGamePlayer.m_Action);
-				SetGameLevel(dataGamePlayer.m_GameLevel);
+				SetGameLevel(dataGamePlayer.m_GameLevel);				
 				SetGift(dataGamePlayer.m_GiftID);
 			}
 			else{

@@ -41,6 +41,7 @@ package Game
 		public var m_PlayerState:int;
 		
 		public var m_GameLevel:int;
+		public var m_GiftID:int;
 		
 		public function Game_PlayerData()
 		{
@@ -79,6 +80,7 @@ package Game
 			m_PlayerState = 0;
 			
 			m_GameLevel = 0;
+			m_GiftID = 0;
 		}
 		
 		override public function Write(msgdata:MsgData):void
@@ -121,6 +123,7 @@ package Game
 			m_PlayerState = msgdata.ReadUnsignedByte();
 			
 			m_GameLevel = msgdata.ReadUnsignedByte();
+			m_GiftID = msgdata.ReadInt();
 			
 			//trace(m_nGameMoney,m_nMoGuiMoney);
 		}

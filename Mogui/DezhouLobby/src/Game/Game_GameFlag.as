@@ -12,6 +12,7 @@ package Game
 		public static const LAND_OTHER_PLACE:int     = 1;
 		public static const CheckClientExist:int     = 2;
 		public static const LobbyReady:int           = 3;
+		public static const GiftID:int               = 4;
 		
 		public var m_Flag:int;
 		public var m_nValue:int;

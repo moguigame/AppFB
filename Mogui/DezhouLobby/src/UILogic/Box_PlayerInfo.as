@@ -153,11 +153,15 @@ package UILogic
 			else if( (evt.m_Flag == GameStageMsg.PlayerGift || evt.m_Flag == GameStageMsg.PlayerGiftList) ){
 				if( m_tab.selectedIndex == s_Gift ){
 					UpdateCurGift();
-				}
+				}				
 			}
 			else if( evt.m_Flag == GameStageMsg.RecvGift ){
 				if( m_tab.selectedIndex == s_Gift ){
 					UpdateCurGift();
+				}
+				var nGiftID:int = int(evt.m_msgString);
+				if( nGiftID != m_CurGiftID ){
+					ChangeGift(nGiftID);
 				}
 			}
 			else if( evt.m_Flag == GameStageMsg.SoldGift ){
@@ -176,10 +180,32 @@ package UILogic
 				}
 			}
 			else if( evt.m_Flag == GameStageMsg.ChangeGift ){
-				
+				if( evt.m_Value == m_CurPID ){
+					var nTempGiftID:int = int(evt.m_msgString);
+					if( nTempGiftID != m_CurGiftID ){
+						ChangeGift(nTempGiftID);
+					}
+				}
 			}
 		}		
 		
+		private function ChangeGift(GiftID:int):void{
+			if( GiftID == 0 ){
+				m_CurGiftID = 0;
+				m_mcGift.visible = false;
+			}
+			else if( GiftID != m_CurGiftID ){
+				m_CurGiftID = GiftID;
+				
+				var TempClass:Class;
+				TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(GiftID));
+				removeChild(m_mcGift);
+				m_mcGift = new TempClass();
+				addChild(m_mcGift);
+				m_mcGift.x = -10;
+				m_mcGift.y = 30;
+			}
+		}
 		private function OnSetGift(evt:MouseEvent):void{	
 			if( m_CurPID == GlobleData.s_MyPID && m_tab.selectedIndex == s_Gift && m_GiftFlag==0 
 				&& m_ListCurGift.selectedIndex>=0 && m_ListCurGift.selectedIndex<m_arrayCurGift.length ) {
@@ -187,16 +213,11 @@ package UILogic
 				var nTempGiftID:int = m_arrayCurGift[m_ListCurGift.selectedIndex].m_GiftID;
 				if( nTempGiftID != m_CurGiftID ){
 					m_SetGiftIdx = nGiftIdx;
-					var TempClass:Class;
-					TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(nTempGiftID));
-					m_mcGift = new TempClass();
-					addChild(m_mcGift);
-					m_mcGift.x = -10;
-					m_mcGift.y = 30;
+					ChangeGift(nTempGiftID);
 				}
 				else{
 					m_SetGiftIdx = 0;
-				}				
+				}
 				
 				addChild(m_TimeMask);
 				m_TimeMask.ShowTime(1000);
@@ -295,9 +316,17 @@ package UILogic
 			m_textNickName.text    = InfoData.m_NickName;
 			if( InfoData.m_PID ==  GlobleData.s_MyPID ){
 				m_textPID.text         = String(InfoData.m_PID);
+				
+				m_textPID.visible = true;
+				m_btnSetCurGift.visible = true;
+				m_btnSellCurGift.visible = true;
+				m_btnSellPassGift.visible = true;
 			}
 			else{
-				m_textPID.visible = false;
+				m_textPID.visible = false;				
+				m_btnSetCurGift.visible = false;
+				m_btnSellCurGift.visible = false;
+				m_btnSellPassGift.visible = false;
 			}			
 			m_textGameMoney.text   = "$"+String(InfoData.m_nGameMoney);
 			
@@ -403,7 +432,7 @@ package UILogic
 			msgFlag.m_Value      = BTN_CLOSE;
 			GlobleFunc.SendStageToLobby(stage,msgFlag);
 			
-			if( m_SetGiftIdx > 0 ){				
+			if( m_SetGiftIdx > 0 ){
 				msgFlag.m_Flag     = S2L_Flag.PlayerInfo;
 				msgFlag.m_Value    = BTN_CHANGEGIFT;
 				msgFlag.m_msgString = String(m_SetGiftIdx);

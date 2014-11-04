@@ -2293,10 +2293,8 @@ package
 			var msgSG:Game_RecvGift = new Game_RecvGift();
 			msgSG.Read(msgData);
 			
-			//m_MyData.AddGiftInfo(msgSG.m_GiftInfo,);
-			
 			GlobleData.AddPlayerGift(msgSG);
-			GlobleFunc.SendGameStageMsg(GameStageMsg.RecvGift,msgSG.m_RecvPID,"");
+			GlobleFunc.SendGameStageMsg(GameStageMsg.RecvGift,msgSG.m_RecvPID,String(msgSG.m_GiftInfo.m_GiftID));
 		}
 		
 		private function OnPlayerGiftInfo(msgData:MsgData):void
@@ -2364,6 +2362,11 @@ package
 			
 			if( msgCG.m_nFlag == 0 ){
 				GlobleFunc.SendGameStageMsg(GameStageMsg.ChangeGift,msgCG.m_PID,String(msgCG.m_GiftID) );
+				
+				var TempPI:Data_PlayerInfo = GlobleData.GetPlayerInfoByPID(msgCG.m_PID);
+				if( TempPI ){
+					TempPI.m_GiftID = msgCG.m_GiftID;
+				}
 			}
 		}
 		private function OnPlayerGameMoney(msgData:MsgData):void
@@ -2578,6 +2581,7 @@ package
 			DebugLog("OnPlayerData Position State",m_MyData.m_RoomID,m_MyData.m_TableID,m_MyData.m_SitID,m_MyData.m_PlayerState);
 			
 			m_MyData.m_GameLevel       = msgPD.m_GameLevel;
+			m_MyData.m_GiftID          = msgPD.m_GiftID;
 			
 			m_spTitle.SetGameMoney(msgPD.m_nGameMoney);
 			m_spTitle.SetMoGuiMoney(msgPD.m_nMoGuiMoney);

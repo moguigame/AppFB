@@ -218,7 +218,7 @@ package
 			m_FaPaiTime = 0;
 			m_DivideTime = 0;
 			m_ClientState = DeZhouDef.ClientState_None;
-			m_MyData = new Data_PlayerInfo();
+			m_MyData = null;
 			
 			m_dataGameTable = new Data_GameTable();
 			
@@ -465,6 +465,7 @@ package
 		public function SetLobby(pLobby:DezhouLobby):void
 		{
 			m_pLobby = pLobby;
+			m_MyData = pLobby.m_MyData;
 		}
 		public function SetLobbyRes(pRes:CLoadResource):void
 		{
