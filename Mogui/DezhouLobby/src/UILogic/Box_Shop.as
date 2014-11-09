@@ -121,7 +121,7 @@ package UILogic
 			if( this.visible == false ){
 				return ;
 			}
-			if( evt.m_Flag == GameStageMsg.RespGameSengGift ){				
+			if( evt.m_Flag == GameStageMsg.RespGameSengGift ){
 				if( evt.m_Value == DeZhouDef.MsgFlag_Success ){
 					if( m_SendType == ShopType_MySelf ){
 						m_TiShi.m_tTishi.SetText("自已购买成功");
@@ -256,6 +256,23 @@ package UILogic
 		}
 		private function OnBtnSendAllPlayer(evt:MouseEvent):void
 		{
+			if( m_SendType == ShopType_Player && m_PIDSendPlayer>0 ){
+				if( m_nSelectGiftID > 0 ){
+					addChild(m_TimeMask);
+					m_TimeMask.ShowTime(500);
+					
+					m_TiShi.m_tTishi.SetText("");
+					
+					var msgFlag:S2L_Flag = new S2L_Flag();
+					msgFlag.m_Flag      = S2L_Flag.Shop;
+					msgFlag.m_Value     = E_BuyAllPlayer;
+					GlobleFunc.SendStageToLobby(stage,msgFlag);
+				}
+				else{
+					m_TiShi.m_tTishi.SetText("请选择你要购买的礼物");
+					m_TiShi.ShowTime(2000);
+				}
+			}
 		}
 		
 		private function OnLoadXMLComplete(evt:Event):void
@@ -303,7 +320,7 @@ package UILogic
 				m_TabGiftType = GiftType_ZiChan;
 			}
 			
-			m_listGift.selectedIndex = 0;
+			m_listGift.selectedIndex = -1;
 			m_listGift.scrollBar.value = 0;
 			OnSelectGift(null);
 			

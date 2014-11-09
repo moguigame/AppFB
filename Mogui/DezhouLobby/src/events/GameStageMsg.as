@@ -17,6 +17,8 @@ package events
 		public static const SoldGift:int             = 23;
 		public static const ChangeGift:int           = 24;
 		
+		public static const MotionSendGift:int       = 31;
+		
 		public var m_Flag:int;
 		public var m_Value:Number;
 		public var m_msgString:String;

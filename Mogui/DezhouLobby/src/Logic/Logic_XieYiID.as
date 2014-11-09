@@ -57,6 +57,7 @@ package Logic
 		public static const GameXYID_PromoteTime:int                   = LogicXYIDStart+141;
 		
 		public static const GameXYID_JoinJuBaoPengInfo:int             = LogicXYIDStart+163;
+		public static const GameXYID_WinJuBaoPeng:int                  = LogicXYIDStart+164;
 		
 		public function Logic_XieYiID()
 		{

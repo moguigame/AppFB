@@ -185,16 +185,18 @@ package UILogic
 			}
 		}
 		
-		public function SetGift(GID:int):void{			
+		public function SetGift(GID:int):void{
 			if( GID == 0 ){
 				if( m_mcGift ){
 					m_mcGift.visible = false;
 				}
 			}
-			else if( GID != m_GiftID ){			
+			else if( GID != m_GiftID ){	
+				removeChild(m_mcGift);
+				m_GiftID = GID;
+				
 				var TempClass:Class;
-				TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(GID));	
-				this.removeChild(m_mcGift);
+				TempClass = GlobleData.S_pResLobby.GetResource("Gift_"+String(GID));				
 				m_mcGift = new TempClass();
 				addChild(m_mcGift);
 				m_mcGift.visible = true;

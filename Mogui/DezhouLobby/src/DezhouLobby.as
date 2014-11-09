@@ -1018,7 +1018,10 @@ package
 						ClientSengLogicMsg(msgLogicSG);
 					}
 					else if( msgFlag.m_Value == Box_Shop.E_BuyAllPlayer ){
-						
+						msgLogicSG.m_GiftID  = m_winShop.m_boxShop.m_nSelectGiftID;
+						msgLogicSG.m_SendPID = GlobleData.s_MyPID;
+						msgLogicSG.m_vecToPID.push(int(-1));
+						ClientSengLogicMsg(msgLogicSG);
 					}
 				}
 				break;

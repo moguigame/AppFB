@@ -31,6 +31,7 @@ package
 	import L2C.S2C_MoveMinPai;
 	import L2C.S2C_MoveMoney;
 	import L2C.S2C_TableChatMsg;
+	import L2C.S2L_Flag;
 	
 	import Logic.Logic_AddChipInfo;
 	import Logic.Logic_AddMoneyInfo;
@@ -74,6 +75,7 @@ package
 	import PublicXY.Public_XYBase;
 	
 	import UILogic.BigHandPai;
+	import UILogic.Box_Shop;
 	import UILogic.Box_TakeMoney;
 	import UILogic.BtnSitDown;
 	import UILogic.CChatDialog;
@@ -94,17 +96,18 @@ package
 	import UILogic.GamePlayerDetail;
 	import UILogic.MinHandPai;
 	import UILogic.MingYanBoard;
+	import UILogic.Motion_SendGift;
 	import UILogic.QuickStartBoard;
 	import UILogic.ResClass;
 	import UILogic.SpriteTablePai;
 	import UILogic.TableInfoBoard;
 	
 	import events.ClientToLobby;
+	import events.GameStageMsg;
 	import events.LobbyToClient;
 	import events.StageToClient;
 	
 	import morn.core.components.Button;
-	import morn.core.handlers.Handler;
 	
 	public class DezhouGame extends Sprite
 	{
@@ -167,6 +170,7 @@ package
 		private var m_spArrayPaiType:Vector.<CPaiTypeSprite>;
 		private var m_spArrayFace:Vector.<CFaceSprite>;
 		private var m_spArrayChatPao:Vector.<CChatPaoPao>;
+		private var m_spArraySendGift:Vector.<Motion_SendGift>;
 		
 		private var m_spArrayGamePlayerBoard:Vector.<GamePlayerBoard>;//桌面游戏玩家的面板
 		private var m_spArrayBtnSitDown:Vector.<BtnSitDown>;          //每个坐伴上的坐下按钮
@@ -459,6 +463,7 @@ package
 			m_spArrayPaiType     = new Vector.<CPaiTypeSprite>(MaxPlayerOnTable);
 			m_spArrayFace        = new Vector.<CFaceSprite>(MaxPlayerOnTable);
 			m_spArrayChatPao     = new Vector.<CChatPaoPao>(MaxPlayerOnTable);
+			m_spArraySendGift    = new Vector.<Motion_SendGift>();
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, OnAddToStage);
 		}
@@ -571,7 +576,9 @@ package
 			DebugLog("GameClient OnAddToStage");
 			
 			stage.addEventListener(LobbyToClient.EVENT_ID,OnLobbyToClient);
-			stage.addEventListener(StageToClient.EVENT_ID,OnStageToClient);	
+			stage.addEventListener(StageToClient.EVENT_ID,OnStageToClient);
+			
+			stage.addEventListener(GameStageMsg.EVENT_ID, OnGameStageMsg);
 			
 			if( m_ClientState == DeZhouDef.ClientState_None )
 			{
@@ -1081,7 +1088,7 @@ package
 				addChild(m_spPlayerAction);
 				
 				m_spPlayerAction.m_Sit = ClientSit;
-				m_spPlayerAction.Show(m_dataArrayGamePlayerInfo[ServerSitID-1],3000);
+				m_spPlayerAction.Show(m_dataArrayGamePlayerInfo[ServerSitID-1],5000);
 				m_spPlayerAction.x = m_ptAction[ClientSit].x;
 				m_spPlayerAction.y = m_ptAction[ClientSit].y;				
 			}
@@ -1310,7 +1317,7 @@ package
 					}
 					else
 					{
-						DebugError("Player ST="+myGP.m_PlayerGameState+" Act="+myGP.m_Action+" PID="+myGP.m_PID);
+						//DebugError("Player ST="+myGP.m_PlayerGameState+" Act="+myGP.m_Action+" PID="+myGP.m_PID);
 					}
 				}
 			}
@@ -1416,10 +1423,21 @@ package
 			trace(new Date().toLocaleTimeString(),"Client",args);
 		}
 		
+		private function OnGameStageMsg(evt:GameStageMsg):void{
+			if( evt.m_Flag == GameStageMsg.MotionSendGift ){
+				for(var Sit:int=0;Sit<m_MaxSitPlayerCount;++Sit){
+					if( m_spArrayGamePlayerBoard[Sit].m_PID == int(evt.m_Value) ){
+						m_spArrayGamePlayerBoard[Sit].SetGift(int(evt.m_msgString));
+						break;
+					}
+				}
+			}
+		}		
+		
 		private function OnBtnBuyMoney(evt:MouseEvent):void
 		{
 			var bCanAdd:Boolean = false;
-			var strChat:String = "";		
+			var strChat:String = "";
 			
 			if( IsRightSitID(m_MyData.m_SitID) )
 			{
@@ -1530,6 +1548,10 @@ package
 			
 			OnTimeFaPai(nGameTime);
 			OnTimeDivideMoney(nGameTime);
+			
+			for(var nSG:int=0;nSG<m_spArraySendGift.length;++nSG){
+				m_spArraySendGift[nSG].OnTime(nGameTime);
+			}
 		}
 		private function OnTimeDivideMoney(nGameTime:int):void
 		{
@@ -1839,7 +1861,14 @@ package
 			{
 				m_spArrayAddMoney[Sit].EndMotion(false);
 				m_spArrayDivideMoney[Sit].EndMotion(false);
-			}		
+			}
+			
+			for(var nSG:int=0;nSG<m_spArraySendGift.length;++nSG){
+				if( m_spArraySendGift[nSG].visible ){
+					m_spArraySendGift[nSG].OnMotionGiftEnd();
+				}
+				m_spArraySendGift[nSG].visible = false;
+			}
 			
 			if( m_MyData.m_SitID == 0 )
 			{
@@ -2434,7 +2463,7 @@ package
 				
 				//以下是未处理的消息
 				case Logic_JoinJuBaoPeng.ID:
-				
+				case Logic_XieYiID.GameXYID_WinJuBaoPeng:
 				case Logic_GamePlayerInfo.ID:
 				{
 					DebugLog("有消息未处理 ID="+TempMsgData.m_msgID);
@@ -3082,6 +3111,68 @@ package
 			
 			DebugLog("OnLogicRespSendGift ",msgSG.m_GiftID,msgSG.m_SendPID,msgSG.m_vecToPID.toString());
 			
+			if( msgSG.m_Flag == 0 ){
+				var msgFlag:S2L_Flag = new S2L_Flag();
+				msgFlag.m_Flag     = S2L_Flag.Shop;
+				msgFlag.m_Value    = Box_Shop.E_Close;
+				GlobleFunc.SendStageToLobby(stage,msgFlag);
+				
+				var Sit:int = 0;
+				var nPos:int = 0;
+				var ClientSendSit:int = -1;
+				var ClientRecvSit:int = 0;
+				var ptStart:Point = new Point();
+				var ptEnd:Point = new Point();
+				for(Sit=0;Sit<m_MaxSitPlayerCount;++Sit){
+					if( m_dataArrayGamePlayerInfo[Sit].m_PID == msgSG.m_SendPID ){
+						ClientSendSit = ServerSitIDToClientSit(Sit+1);
+						break;
+					}
+				}
+				if( ClientSendSit != -1 ){
+					ptStart.x = m_ptGamePlayerBoard[ClientSendSit].x + 20;
+					ptStart.y = m_ptGamePlayerBoard[ClientSendSit].y + 10;
+					
+					for(nPos=0;nPos<msgSG.m_vecToPID.length;++nPos){
+						var RecvPID:int = msgSG.m_vecToPID[nPos];
+						ClientRecvSit = -1;
+						for(Sit=0;Sit<m_MaxSitPlayerCount;++Sit){
+							if( m_dataArrayGamePlayerInfo[Sit].m_PID == RecvPID ){
+								ClientRecvSit = ServerSitIDToClientSit(Sit+1);
+								m_dataArrayGamePlayerInfo[Sit].m_GiftID = msgSG.m_GiftID;
+								break;
+							}
+						}
+						if( ClientRecvSit != -1 ){
+							ptEnd.x = m_ptGamePlayerBoard[ClientRecvSit].x - 45;
+							ptEnd.y = m_ptGamePlayerBoard[ClientRecvSit].y + 10;
+							
+							var spMotionSendGift:Motion_SendGift = null;
+							for(var nSG:int=0;nSG<m_spArraySendGift.length;++nSG){
+								if( m_spArraySendGift[nSG].visible == false ){
+									spMotionSendGift = m_spArraySendGift[nSG];
+									break;
+								}
+							}
+							if( spMotionSendGift == null ){
+								spMotionSendGift = new Motion_SendGift();
+								m_spArraySendGift.push(spMotionSendGift);
+							}
+							if( spMotionSendGift ){
+								spMotionSendGift.visible = true;
+								spMotionSendGift.m_PID = RecvPID;
+								addChild(spMotionSendGift);
+								
+								spMotionSendGift.SetGift(msgSG.m_GiftID);
+								spMotionSendGift.SetPoint(ptStart);
+								
+								spMotionSendGift.MoveToPointByTime(ptEnd,1.2);
+								spMotionSendGift.ShowTime(1500);
+							}
+						}
+					}					
+				}				
+			}			
 		}
 		
 		private function OnLogicGameState(msgdata:MsgData):void
