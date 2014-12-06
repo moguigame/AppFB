@@ -304,6 +304,11 @@ package UILogic
 					m_textAction.text = "大盲注";
 				}
 				break;
+				case DeZhouDef.ACTION_NewBlind:
+				{
+					m_textAction.text = "新手盲注";
+				}
+				break;
 				case DeZhouDef.ACTION_WaitChip:
 				{
 					m_textAction.text = "等待下注";

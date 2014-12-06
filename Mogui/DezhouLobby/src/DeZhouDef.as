@@ -81,7 +81,8 @@ package
 		public static const ACTION_POT:int                = 64;    //底注
 		public static const ACTION_SMALLBLIND:int         = 128;   //小盲注
 		public static const ACTION_BIGBLIND:int           = 256;   //大盲注
-		public static const ACTION_WaitChip:int           = 512;
+		public static const ACTION_NewBlind:int           = 512;
+		public static const ACTION_WaitChip:int           = 8912;
 		
 		public static const BTN_OP_GiveUp:int             = 1;
 		public static const BTN_OP_KanPai:int             = 2;
@@ -104,10 +105,7 @@ package
 		
 		public static const  PriceFlag_Chang:int          = 1;
 		public static const  PriceFlag_Fixed:int          = 2;
-		public static const  PriceFlag_MoGui:int          = 3;
-		
-		
-		
+		public static const  PriceFlag_MoGui:int          = 3;	
 		
 		public function DeZhouDef()
 		{
